@@ -1,0 +1,28 @@
+[project]
+name = "qlge"
+version = "0.1.0"
+description = "Quantum lattice gas: exact diagonalization and ensemble equivalence for the 2D hard-core Bose-Hubbard model"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "matplotlib>=3.8",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+app = ["streamlit>=1.30"]
+anim = ["manim>=0.18"]
+dev = ["pytest>=8.0"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/qlge"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

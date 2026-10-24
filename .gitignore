@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+build/
+dist/
+
+# Cached spectra (regenerable via scripts/run_spectra.py; can be large)
+data/
+!data/.gitkeep
+media/          # Manim output
+
+# figures/ and animations/ ARE tracked: they are the visual deliverables.
+# LaTeX build intermediates
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/b*.log
+
+# OS / editor
+.DS_Store
+.ipynb_checkpoints/
