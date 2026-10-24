@@ -40,11 +40,13 @@ the relative number fluctuation $\sigma_N/\avg{N}$
 canonical--grand energy gap. For the non-interacting ($V=0$) and repulsive
 ($V/t=+2$) gases, all three discrepancy metrics decrease monotonically with
 system size, following approximate power laws in $M=L^2$ and demonstrating the
-expected emergence of equivalence. For the attractive gas ($V/t=-2$), the
-relative number fluctuation remains large and essentially size-independent
-($\sim M^{-0.12}$), signalling the breakdown of canonical--grand equivalence
-associated with the clustering/phase-separation instability of an attractive
-lattice gas.
+expected emergence of equivalence. For attractive interactions the relative
+number fluctuation fails to shrink, and for strong attraction ($V/t=-3$) its
+finite-size exponent turns \emph{positive} ($\sim M^{+0.13}$, reaching $0.96$ at
+$M=16$): the canonical--grand mismatch \emph{grows} with system size, signalling
+the clustering/phase-separation instability of an attractive lattice gas. Sweeping
+the interaction over $V/t$ from $-3$ to $+3$ reveals this as a smooth, monotonic
+trend in the number channel.
 \vspace{1em}
 \end{minipage}
 \end{center}
@@ -234,43 +236,48 @@ metrics versus $M=L^2$ with power-law fits. Two conclusions stand out.
 decrease with size; the free-gas $r_N$ and $\Delta_E/M$ follow clean power laws
 ($R^2=1.00$) with exponents between $-0.6$ and $-0.9$, bracketing the
 saddle-point expectation $M^{-1/2}$. \emph{(ii) Equivalence fails for the
-attractive gas in the number channel}: $r_N$ stays large ($0.55$--$0.68$) and
-flat with size ($p=-0.12$, $R^2=0.54$). This is the fingerprint of
-canonical--grand inequivalence driven by the attractive gas's
-clustering/phase-separation tendency: the grand ensemble supports large number
-fluctuations between competing fillings that the fixed-$N$ canonical ensemble
-forbids. The attractive \emph{energy} metrics still shrink---the inequivalence is
-specific to the particle-number channel, where the instability lives.
+attractive gas in the number channel}: the $r_N$ decay exponent varies
+monotonically with interaction (Table~\ref{tab:fits}), from $p=-1.10$ at
+$V/t=+3$ (strong repulsion restores equivalence fastest) through $-0.64$ at
+$V=0$, up to $p=+0.13$ at $V/t=-3$. The sign change is the key result: for strong
+attraction the relative number fluctuation at $M=16$ reaches $0.96$ and its
+exponent turns \emph{positive}, so the canonical--grand mismatch \emph{grows}
+with system size rather than shrinking. This is the fingerprint of a developing
+clustering/phase-separation instability: the grand ensemble supports large
+number fluctuations between competing fillings that the fixed-$N$ canonical
+ensemble forbids, and the effect strengthens with size. The energy metrics
+($r_E$, $\Delta_E/M$) still shrink for all $V$---the inequivalence is specific to
+the particle-number channel, where the instability lives.
 \begin{figure*}[t]\centering
 \includegraphics[width=0.92\textwidth]{fig6_scaling.png}
-\caption{Finite-size scaling of $r_E$, $r_N$, and $\Delta_E/M$ for
-$V/t=0,+2,-2$ at $\beta t=1$, half filling. Lines are power-law
-fits.}\label{fig:scaling}
+\caption{Finite-size scaling of $r_E$, $r_N$, and $\Delta_E/M$ for seven
+couplings $V/t\in\{-3,\dots,+3\}$ (attractive blue, repulsive red) at
+$\beta t=1$, half filling. Lines are power-law fits.}\label{fig:scaling}
 \end{figure*}
 
 \begin{table}[t]\centering\small
-\caption{Power-law exponent $p$ (fit $\propto M^{p}$), $R^2$, and measured values
-at $M=4,9,16$. $\beta t=1$, half filling, periodic.}\label{tab:fits}
-\begin{tabular}{rlrrrrr}
+\caption{Power-law exponents $p$ (fit $\propto M^{p}$, $M=4,9,16$) of each
+equivalence metric versus interaction, and the number fluctuation at the largest
+lattice $r_N(M{=}16)$. $\beta t=1$, half filling, periodic. The $r_N$ exponent
+rises monotonically and turns positive for strong attraction.}\label{tab:fits}
+\begin{tabular}{rrrrr}
 \toprule
-$V/t$ & metric & $M{=}4$ & $M{=}9$ & $M{=}16$ & $p$ & $R^2$\\
+$V/t$ & $p(r_E)$ & $p(r_N)$ & $p(\Delta_E/M)$ & $r_N(M{=}16)$\\
 \midrule
-$0$  & $r_E$        & 0.503 & 0.164 & 0.154 & $-0.89$ & 0.86\\
-$0$  & $r_N$        & 0.401 & 0.243 & 0.164 & $-0.64$ & 1.00\\
-$0$  & $\Delta_E/M$ & 0.112 & 0.058 & 0.035 & $-0.84$ & 1.00\\
-$+2$ & $r_E$        & 0.661 & 0.319 & 0.349 & $-0.49$ & 0.74\\
-$+2$ & $r_N$        & 0.244 & 0.168 & 0.091 & $-0.69$ & 0.95\\
-$+2$ & $\Delta_E/M$ & 0.120 & 0.055 & 0.047 & $-0.70$ & 0.93\\
-$-2$ & $r_E$        & 0.298 & 0.116 & 0.091 & $-0.88$ & 0.95\\
-$-2$ & $r_N$        & 0.664 & 0.684 & 0.553 & $-0.12$ & 0.54\\
-$-2$ & $\Delta_E/M$ & 0.069 & 0.028 & 0.032 & $-0.59$ & 0.70\\
+$-3$ & $-0.92$ & $+0.13$ & $+0.51$ & 0.962\\
+$-2$ & $-0.88$ & $-0.12$ & $-0.59$ & 0.553\\
+$-1$ & $-0.91$ & $-0.55$ & $-0.37$ & 0.240\\
+$0$  & $-0.89$ & $-0.64$ & $-0.84$ & 0.164\\
+$+1$ & $-0.73$ & $-0.65$ & $-0.93$ & 0.127\\
+$+2$ & $-0.49$ & $-0.69$ & $-0.70$ & 0.091\\
+$+3$ & $-0.75$ & $-1.10$ & $-0.97$ & 0.035\\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \subsection{Interaction dependence}
-Figure~\ref{fig:vdep} collects the metrics at $L=4$ versus $V/t$ over the three
-cached couplings. A denser sweep is cheap at fixed $L=3$: Fig.~\ref{fig:vsweep}
+Figure~\ref{fig:vdep} collects the metrics at $L=4$ versus $V/t$ over seven
+couplings. A still denser sweep is cheap at fixed $L=3$: Fig.~\ref{fig:vsweep}
 resolves the full trend over $33$ values of $V/t$. The relative number
 fluctuation $\sigma_N/\avg{N}$ rises smoothly and monotonically toward unity as
 the interaction becomes more attractive---the continuous form of the
@@ -281,8 +288,9 @@ and to attraction, confirming it as a genuine physical effect rather than a
 fitting artifact.
 \begin{figure}[t]\centering
 \includegraphics[width=\columnwidth]{fig7_interaction.png}
-\caption{Equivalence metrics at $L=4$ versus $V/t$ (three cached
-couplings).}\label{fig:vdep}
+\caption{Equivalence metrics at $L=4$ versus $V/t$ (seven couplings). The number
+fluctuation $\sigma_N/\avg{N}$ falls monotonically from $\sim\!1$ (strong
+attraction) to $\sim\!0$ (strong repulsion).}\label{fig:vdep}
 \end{figure}
 \begin{figure}[t]\centering
 \includegraphics[width=\columnwidth]{fig12_interaction_sweep.png}

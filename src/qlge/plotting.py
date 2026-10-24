@@ -41,6 +41,19 @@ def _vlabel(V: float) -> str:
     return f"$V/t={V:+g}$ ({kind})"
 
 
+def _vcolor(V: float, Vs) -> str:
+    """Diverging color keyed by interaction: attractive->blue, repulsive->red.
+
+    Falls back to the fixed palette when exactly the canonical {-2,0,+2} set is
+    plotted (keeps earlier figures visually identical).
+    """
+    Vs = sorted(Vs)
+    if set(Vs) <= {-2.0, 0.0, 2.0}:
+        return _VCOLORS.get(V, "#333333")
+    vmax = max(abs(min(Vs)), abs(max(Vs)), 1e-9)
+    return plt.cm.coolwarm(0.5 + 0.5 * V / vmax)
+
+
 def save(fig, path: str) -> str:
     fig.savefig(path, bbox_inches="tight")
     plt.close(fig)
@@ -170,25 +183,28 @@ def fig_scaling(spectra_by_V_L: dict[float, dict[int, Spectrum]], beta: float, f
         ("rel_number_fluctuation", r"$\sigma_N/\langle N\rangle$"),
         ("energy_discrepancy_per_site", r"$|\Delta\langle E\rangle|/M$"),
     ]
+    Vs = sorted(spectra_by_V_L)
     fig, axes = plt.subplots(1, 3, figsize=(13.5, 4.3))
     for ax, (attr, label) in zip(axes, metrics):
-        for V, spectra in sorted(spectra_by_V_L.items()):
+        for V in Vs:
+            spectra = spectra_by_V_L[V]
             pts = scaling_sweep(spectra, beta=beta, filling=filling)
             M = np.array([p.M for p in pts], float)
             y = np.array([getattr(p, attr) for p in pts], float)
-            color = _VCOLORS.get(V, None)
-            ax.loglog(M, y, "o", color=color, label=_vlabel(V))
+            color = _vcolor(V, Vs)
+            # One legend entry per V, carrying the fitted exponent.
             try:
                 fit = fit_power_law(M, y)
                 mm = np.linspace(M.min(), M.max(), 50)
-                ax.loglog(mm, fit.predict(mm), "-", color=color, alpha=0.6,
-                          label=f"  $\\sim M^{{{fit.exponent:+.2f}}}$")
+                ax.loglog(mm, fit.predict(mm), "-", color=color, alpha=0.6)
+                lab = f"$V/t={V:+g}$ ($M^{{{fit.exponent:+.2f}}}$)"
             except ValueError:
-                pass
+                lab = f"$V/t={V:+g}$"
+            ax.loglog(M, y, "o", color=color, label=lab)
         ax.set_xlabel("system size $M=L^2$")
         ax.set_ylabel(label)
         ax.set_title(label)
-        ax.legend(fontsize=8)
+        ax.legend(fontsize=7, ncol=1)
     fig.suptitle(
         rf"Emergence of ensemble equivalence with size, $\beta t={beta:g}$, filling $={filling:g}$",
         y=1.03,
