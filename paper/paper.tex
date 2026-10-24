@@ -12,11 +12,13 @@
 
 \newcommand{\bd}{\hat b^\dagger}
 \newcommand{\avg}[1]{\langle #1 \rangle}
+\newcommand{\Tr}{\mathrm{Tr}\,}
+\newcommand{\Var}{\mathrm{Var}}
 
-\title{\vspace{-1.5em}\textbf{Emergence of Statistical-Ensemble Equivalence in a\\
-Two-Dimensional Interacting Quantum Lattice Gas}}
+\title{\vspace{-1.5em}\textbf{How the three ensembles come to agree: an exact study
+of a two-dimensional quantum lattice gas}}
 \author{Prasang Das \and Aryan Shakya \and Dhruv Thakur}
-\date{\small A computational statistical-mechanics study by exact diagonalization}
+\date{\small Exact diagonalization of the hard-core Bose--Hubbard model}
 
 \begin{document}
 \twocolumn[
@@ -24,245 +26,312 @@ Two-Dimensional Interacting Quantum Lattice Gas}}
 \begin{center}
 \begin{minipage}{0.92\textwidth}
 \small\textbf{Abstract.}
-We study the equivalence of the microcanonical, canonical, and grand-canonical
-ensembles in a two-dimensional hard-core Bose--Hubbard model---an interacting
-\emph{quantum lattice gas}---as a controlled function of system size and
-interaction strength. Using full-spectrum exact diagonalization on square
-lattices of $L\times L=4,9,16$ sites, in every conserved particle-number sector,
-we compute each ensemble's thermodynamics from a single shared set of
-eigenvalues. We find that finite-difference microcanonical temperature and
-chemical potential are numerically ill-conditioned on the small bounded discrete
-spectra reachable by exact diagonalization, and we therefore quantify ensemble
-equivalence through well-conditioned fluctuation observables: the relative energy
-fluctuation $\sigma_E/|\avg{E}|$ (microcanonical$\leftrightarrow$canonical) and
-the relative number fluctuation $\sigma_N/\avg{N}$
-(canonical$\leftrightarrow$grand-canonical), together with the per-site
-canonical--grand energy gap. For the non-interacting ($V=0$) and repulsive
-($V/t=+2$) gases, all three discrepancy metrics decrease monotonically with
-system size, following approximate power laws in $M=L^2$ and demonstrating the
-expected emergence of equivalence. For attractive interactions the relative
-number fluctuation fails to shrink, and for strong attraction ($V/t=-3$) its
-finite-size exponent turns \emph{positive} ($\sim M^{+0.13}$, reaching $0.96$ at
-$M=16$): the canonical--grand mismatch \emph{grows} with system size, signalling
-the clustering/phase-separation instability of an attractive lattice gas. Sweeping
-the interaction over $V/t$ from $-3$ to $+3$ reveals this as a smooth, monotonic
-trend in the number channel.
+Statistical mechanics asserts that the microcanonical, canonical, and
+grand-canonical ensembles agree in the thermodynamic limit. For a system of a
+handful of particles the agreement is only approximate, and how good the
+approximation is becomes a question one can answer by direct computation. We
+diagonalize the two-dimensional hard-core Bose--Hubbard model completely---every
+eigenvalue in every particle-number sector---on square lattices of $4$, $9$, and
+$16$ sites, and build all three ensembles from the one spectrum. Reading the
+temperature and chemical potential off the microcanonical entropy by finite
+differences turns out to be unreliable on spectra this small and this sharply
+bounded, so we track equivalence instead through quantities that are smooth sums
+over the spectrum: the relative energy fluctuation $\sigma_E/|\avg E|$ and the
+relative particle-number fluctuation $\sigma_N/\avg N$, both of which fall as
+$1/\sqrt M$ when the ensembles converge. For the free gas and for repulsion they
+do fall, with fits close to that rate. Attraction is different. The number
+fluctuation stays large, and for $V/t=-3$ its finite-size exponent is
+positive---the canonical-to-grand mismatch \emph{grows} with the lattice rather
+than shrinking, which is what a lattice gas on the verge of phase separation
+should do. Sweeping $V/t$ from $-3$ to $+3$ turns this into a single monotonic
+curve in the number channel.
 \vspace{1em}
 \end{minipage}
 \end{center}
 ]
 
 \section{Introduction}
-The equivalence of statistical ensembles is a foundational assertion of
-equilibrium statistical mechanics: in the thermodynamic limit, the
-microcanonical ($N,V,E$), canonical ($N,V,T$), and grand-canonical ($\mu,V,T$)
-descriptions yield the same intensive thermodynamics. It is a \emph{limit}
-statement. For finite systems---nanoscale devices, cold-atom quantum simulators,
-and all numerically exact many-body calculations---the ensembles differ by
-corrections that vanish only as the particle number grows. Understanding the rate
-and mechanism of this convergence, and when it fails, is both conceptually
-central and practically important.
+Write down a box of gas three different ways---fixed energy, fixed temperature,
+fixed chemical potential---and thermodynamics says you get the same answer. The
+statement is exact only when the number of particles runs to infinity. Everything
+actually computed, measured in a trap, or simulated on a lattice has a finite
+number of particles, and then the three descriptions differ. The size of that
+difference, and the way it shrinks as the system grows, is the subject of this
+paper.
 
-We address the question in a minimal but nontrivial quantum model and ask: how
-does the equivalence of the three ensembles emerge in an interacting quantum
-lattice gas as system size increases, and how do quantum hopping and interaction
-affect the finite-size discrepancies? We study the two-dimensional hard-core
-Bose--Hubbard model---a quantum lattice gas in the statistical-mechanical sense
-(indistinguishable quantum particles on lattice sites with tunnelling and
-interaction), realized by ultracold bosons in optical lattices in the hard-core
-limit. This is unrelated to the identically named ``quantum lattice-gas
-automaton'' of quantum computing; we study the many-body physical model.
+We work with the hard-core Bose--Hubbard model on a square lattice: bosons that
+hop between neighboring sites with amplitude $t$, repel or attract neighbors with
+energy $V$, and are forbidden from sharing a site. It is a quantum lattice gas in
+the plain sense of the phrase---a gas of quantum particles sitting on a
+lattice---and it is realized by cold bosonic atoms in an optical lattice in the
+strongly interacting limit. (It has nothing to do with the ``quantum lattice-gas
+automaton,'' a cellular-automaton algorithm that shares the name.) Two features
+make it a good test bed. The local Hilbert space is two states per site, so the
+whole spectrum is reachable by exact diagonalization for small lattices, and the
+interaction can be dialed from repulsive through free to attractive without
+changing anything else.
 
-Our methodology is correctness-first: we build the Hamiltonian in each conserved
-$N$-sector, validate against independent analytic and brute-force results,
-diagonalize fully, and only then compare ensembles. A central methodological
-finding---that finite-difference microcanonical $T$ and $\mu$ are unreliable at
-these sizes---leads us to anchor the study on fluctuation observables that are
-smooth sums over the spectrum.
+The plan is ordinary but the order matters: build the Hamiltonian sector by
+sector, check it against anything that can be computed another way, diagonalize,
+and only then assemble ensembles and compare. One result of that discipline is
+negative and worth stating early. The textbook route to the microcanonical
+temperature---differentiate $S=\ln\Omega$ with respect to energy---does not
+survive contact with a spectrum of a few thousand discrete, bounded levels. We
+show why below and route around it.
 
-\section{Model and methods}
-\subsection{Hamiltonian}
-On an $L\times L$ square lattice with $M=L^2$ sites we consider hard-core bosons
-with nearest-neighbor hopping and interaction,
+\section{Model}
+On an $L\times L$ lattice with $M=L^2$ sites,
 \begin{equation}
 \hat H=-t\!\sum_{\langle i,j\rangle}\!\big(\bd_i \hat b_j+\bd_j \hat b_i\big)
-+V\!\sum_{\langle i,j\rangle}\!\hat n_i \hat n_j,\quad \hat n_i=\bd_i\hat b_i,
++V\!\sum_{\langle i,j\rangle}\!\hat n_i \hat n_j,
+\qquad \hat n_i=\bd_i\hat b_i,
 \end{equation}
-with the hard-core constraint $\hat n_i\in\{0,1\}$,
-$\hat b_i^2=(\bd_i)^2=0$. Here $t$ is the hopping amplitude, $V$ the
-nearest-neighbor interaction ($V>0$ repulsive, $V<0$ attractive). We set $k_B=1$
-and measure energy in units of $t$, so the controls are $V/t$, $T/t$, $\mu/t$,
-and use periodic boundary conditions. The Hamiltonian conserves particle number,
-$[\hat H,\hat N]=0$, hence is block-diagonal in $N$: we diagonalize each
-fixed-$N$ block and reuse the eigenvalues in all three ensembles. In the
-occupation basis hard-core bosons carry no inter-site exchange sign, so each
-hopping element is $-t$ and every block is real symmetric.
+with the hard-core condition $\hat n_i\in\{0,1\}$, $\hat b_i^2=(\bd_i)^2=0$. The
+sum is over nearest-neighbor bonds, counted once. We set $k_B=1$, measure energy
+in units of $t$, and use periodic boundaries. Because $\hat H$ commutes with
+$\hat N=\sum_i\hat n_i$, it is block diagonal in particle number; each block is
+diagonalized on its own and the eigenvalues feed all three ensembles. In the
+occupation basis the hard-core operators carry no sign between sites, so a hop
+contributes exactly $-t$ and every block is a real symmetric matrix.
 
-\subsection{Basis and exact diagonalization}
-A basis state is an occupation string encoded as an integer whose $i$-th bit is
-$n_i$. The full space has dimension $2^M$; the fixed-$N$ sector has dimension
-$\binom{M}{N}$. Because the canonical and grand partition functions sum over the
-\emph{entire} spectrum, we require all eigenvalues of each block and use a dense
-symmetric eigensolver (\texttt{eigvalsh}) rather than an iterative method. The
-ceiling is the half-filling sector $\binom{M}{M/2}$; for $L=4$ this is $12\,870$,
-diagonalized in minutes. Per-sector spectra are cached once and reused.
+A basis state is a string of occupations stored as an integer, bit $i$ holding
+$n_i$. The $N$-particle sector has dimension $\binom{M}{N}$, and the sectors add
+up to $2^M$. The canonical and grand-canonical sums run over the whole spectrum,
+not a few low-lying states, so we diagonalize each block densely rather than with
+a Lanczos method. The half-filled sector sets the cost: $\binom{16}{8}=12\,870$
+for $L=4$, a few minutes on a workstation. We cache the spectra once.
 
-\subsection{Three ensembles from one spectrum}
-With $E_{N,\alpha}$ the $\alpha$-th eigenvalue of sector $N$:
-microcanonical $\Omega(E,N;\Delta E)=\#\{\alpha:E\le E_{N,\alpha}<E+\Delta E\}$,
-$S=\ln\Omega$; canonical $Z_N=\sum_\alpha e^{-\beta E_{N,\alpha}}$,
-$\avg{E}_N=-\partial_\beta\ln Z_N$, $C_V=\beta^2\mathrm{Var}(E)$;
-grand-canonical $\Xi=\sum_N e^{\beta\mu N}Z_N$,
-$\avg{N}=\sum_{N,\alpha}N p_{N,\alpha}$,
-$\partial_\mu\avg{N}=\beta\mathrm{Var}(N)$, with
-$p_{N,\alpha}=e^{-\beta(E_{N,\alpha}-\mu N)}/\Xi$. All partition functions use a
-log-sum-exp shift to prevent overflow.
+\section{The three ensembles}
+Everything below starts from one object: the set of eigenvalues $E_{N,\alpha}$,
+where $N$ labels the particle-number sector and $\alpha$ the level within it. The
+three ensembles are three ways of weighting that set.
 
-\subsection{Measuring equivalence: fluctuation metrics}
-Extracting $T,\mu$ from microcanonical finite differences is fragile on small
-bounded discrete spectra: $S(E)=\ln\Omega$ is a jagged window-dependent
-histogram whose derivative diverges in spectral gaps (low $T$) and flips sign
-near the density-of-states maximum (the negative-temperature region of a bounded
-spectrum). We verified this across surface-entropy, Gaussian-broadened, and
-Gibbs/volume-entropy variants; it is an intrinsic small-system limitation.
+\subsection{Microcanonical}
+An isolated system with $N$ particles and energy in a window $[E,E+\Delta E)$
+visits each accessible level with equal probability. Counting them,
+\begin{equation}
+\Omega(E,N;\Delta E)=\#\{\alpha:\,E\le E_{N,\alpha}<E+\Delta E\},\qquad
+S=\ln\Omega .
+\end{equation}
+The first law without a volume term, $dE=T\,dS+\mu\,dN$, gives temperature and
+chemical potential as slopes of the entropy surface,
+\begin{equation}
+\frac1T=\left(\frac{\partial S}{\partial E}\right)_{\!N},\qquad
+\mu=-T\left(\frac{\partial S}{\partial N}\right)_{\!E}.
+\label{eq:micro-Tmu}
+\end{equation}
+Both slopes have to be taken as finite differences, since $E$ is discrete and $N$
+is an integer. The window width $\Delta E$ is a modeling choice that does not go
+away: $\Omega$ is a histogram, and its bin size shows up in every quantity
+derived from it.
 
-We therefore quantify equivalence through smooth spectral sums requiring no
-differentiation:
+\subsection{Canonical}
+Put the system in weak contact with a bath and hold the total energy fixed. The
+probability of the system sitting in level $\alpha$ is proportional to the number
+of bath states compatible with it, $\Omega_{\rm bath}(E_{\rm tot}-E_\alpha)=
+e^{S_{\rm bath}(E_{\rm tot}-E_\alpha)}$. The system energy is tiny against the
+bath, so expanding to first order,
+\begin{equation}
+S_{\rm bath}(E_{\rm tot}-E_\alpha)\simeq \text{const}-\beta E_\alpha,\qquad
+\beta=\frac{\partial S_{\rm bath}}{\partial E}=\frac1T,
+\end{equation}
+and the Boltzmann weight follows:
+\begin{equation}
+p_\alpha=\frac{e^{-\beta E_{N,\alpha}}}{Z_N},\qquad
+Z_N(\beta)=\sum_\alpha e^{-\beta E_{N,\alpha}} .
+\end{equation}
+Mean energy and its fluctuation are derivatives of $\ln Z_N$:
 \begin{align}
-r_E&\equiv\frac{\sigma_E}{|\avg{E}|}=\frac{\sqrt{\mathrm{Var}(E)}}{|\avg{E}|}\sim M^{-1/2},\\
-r_N&\equiv\frac{\sigma_N}{\avg{N}}=\frac{\sqrt{\mathrm{Var}(N)}}{\avg{N}}\sim M^{-1/2},\\
-\Delta_E/M&\equiv\frac{1}{M}\big|\avg{E}_{\text{grand}}-\avg{E}_{\text{can}}\big|.
+\avg E_N&=-\frac{\partial \ln Z_N}{\partial\beta}=\sum_\alpha E_\alpha p_\alpha,\\
+\Var(E)&=\frac{\partial^2\ln Z_N}{\partial\beta^2}
+=\avg{E^2}-\avg E^2 .
 \end{align}
-$r_E$ measures the sharpness of the canonical energy saddle (micro$\leftrightarrow$canonical);
-$r_N$ measures the number-distribution width at $\mu^{*}$ tuned so $\avg{N}=N$
-(canonical$\leftrightarrow$grand). Since $\avg{N}(\mu)$ is monotone
-($\partial_\mu\avg{N}=\beta\mathrm{Var}(N)>0$), $\mu^{*}$ is unique and found by
-Brent's method to $10^{-10}$. Finite-difference $T,\mu$ are kept only as a
-noisy secondary diagnostic.
+The heat capacity is fixed by the fluctuation, not by any separate measurement:
+differentiating $\avg E$ with respect to $T$ and using $d\beta/dT=-\beta^2$,
+\begin{equation}
+C_V=\frac{\partial\avg E}{\partial T}=\beta^2\,\Var(E).
+\label{eq:cv}
+\end{equation}
+The Gibbs entropy $-\sum_\alpha p_\alpha\ln p_\alpha$ collapses to
+$S=\beta\avg E+\ln Z_N$, and $F_N=-T\ln Z_N=\avg E-TS$.
+
+\subsection{Grand canonical}
+Let the system trade particles with the reservoir as well. The same first-order
+expansion, now in both energy and number, with $\partial S_{\rm res}/\partial
+N=-\beta\mu$, gives
+\begin{equation}
+p_{N,\alpha}=\frac{e^{-\beta(E_{N,\alpha}-\mu N)}}{\Xi},\qquad
+\Xi(\beta,\mu)=\sum_N e^{\beta\mu N}Z_N(\beta).
+\end{equation}
+The mean number and its fluctuation are $\mu$-derivatives of $\ln\Xi$,
+\begin{equation}
+\avg N=\frac1\beta\frac{\partial\ln\Xi}{\partial\mu}=\sum_{N,\alpha}N\,p_{N,\alpha},
+\qquad
+\frac{\partial\avg N}{\partial\mu}=\beta\,\Var(N),
+\label{eq:dndmu}
+\end{equation}
+the second being the compressibility sum rule, derived the same way as
+Eq.~\eqref{eq:cv}. Since $\Var(N)>0$, $\avg N(\mu)$ increases monotonically, a
+fact we lean on when matching ensembles. The mean energy is
+$\avg E=-\partial_\beta\ln\Xi+\mu\avg N$.
+
+\subsection{When they agree, and by how much}
+The canonical partition function is a Laplace transform of the microcanonical
+count. Writing the level density as $\rho_N(E)=\sum_\alpha\delta(E-E_\alpha)\approx
+e^{S(E)}$,
+\begin{equation}
+Z_N(\beta)=\int\! dE\,\rho_N(E)\,e^{-\beta E}
+=\int\! dE\,e^{\,S(E)-\beta E}.
+\end{equation}
+For large $M$ the integral is dominated by the energy $E^\ast$ where
+$S'(E^\ast)=\beta$---which is exactly the microcanonical relation
+Eq.~\eqref{eq:micro-Tmu} identifying the two temperatures. Expanding around the
+saddle, the canonical energy distribution is Gaussian with width
+$\sigma_E^2=-1/S''(E^\ast)$. Entropy and energy are both extensive, so $S'$ is
+intensive and $S''\sim\mathcal O(1/M)$; hence $\sigma_E^2\sim M$ and
+\begin{equation}
+\frac{\sigma_E}{|\avg E|}\sim\frac{\sqrt M}{M}=\frac1{\sqrt M}.
+\label{eq:relE}
+\end{equation}
+The same argument applied to $\Xi=\sum_N e^{\beta\mu N}Z_N$, now with a saddle in
+$N$, gives $\sigma_N/\avg N\sim 1/\sqrt M$. These two ratios are the small
+parameters of ensemble equivalence: when they are small the canonical energy and
+grand-canonical number distributions are sharp, and fixing $T$ or $\mu$ is the
+same as fixing $E$ or $N$. They are also pure spectral sums, with no
+differentiation, which is what makes them usable on a small discrete spectrum.
+
+\subsection{Why we do not read $T$ off the entropy}
+Equation~\eqref{eq:micro-Tmu} is the honest definition of the microcanonical
+temperature, and on a small spectrum it is close to useless. $S(E)=\ln\Omega$ is
+a jagged histogram; its slope swings wildly, diverges wherever the matched energy
+lands in a gap, and changes sign past the middle of the band, where the density
+of states peaks and the lattice gas enters its negative-temperature regime.
+Figure~\ref{fig:caloric} shows the damage. We tried surface, Gaussian-broadened,
+and volume (Gibbs) entropies; none rescues a single-energy thermometer at these
+sizes. So Eq.~\eqref{eq:micro-Tmu} stays in the paper as a diagnostic, with its
+$\Delta E$ dependence reported, and the quantitative claims rest on
+Eq.~\eqref{eq:relE} and its number-channel twin.
+
+To match the ensembles at a common operating point we fix $N$ and $\beta$, take
+the canonical $\avg E_N(\beta)$, and solve $\avg N(\beta,\mu^\ast)=N$ for the
+chemical potential. Monotonicity of $\avg N(\mu)$ makes the root unique; Brent's
+method finds it to $10^{-10}$. The energy per site compared across ensembles at
+that point, $|\avg E_{\rm grand}-\avg E_{\rm can}|/M$, is the third metric we
+track.
 
 \section{Validation}
-The implementation was validated against independent references, all encoded as
-automated tests: (i) Hermiticity of every block to machine precision; (ii)
-sector dimension $\binom{M}{N}$ with sectors partitioning $2^M$; (iii)
-particle-number conservation---an independently built full-space Hamiltonian is
-block-diagonal in $N$ and its spectrum equals the union of per-sector spectra to
-$10^{-10}$; (iv) the analytic $V=0$, $2\times2$, $N=1$ spectrum
-$\{-2t,0,0,+2t\}$ (four-site ring); (v) the trace identity $\mathrm{Tr}\,H=V\sum
-(\text{occupied bonds})$; (vi) the $T\to0$ and $T\to\infty$ limits of $\avg{E}$,
-$S$, and $C_V$. Ground-state energies ($V=0$): $E_0/t=-2.828,-10.347,-18.000$ for
-$L=2,3,4$. The full suite (57 tests) passes.
+Each check below is a regression test in the code.
+\emph{(i)}~Every sector block is symmetric to machine precision.
+\emph{(ii)}~Block dimensions are $\binom{M}{N}$ and sum to $2^M$.
+\emph{(iii)}~A separately written full-space Hamiltonian is block diagonal in $N$,
+and the union of per-sector spectra equals its spectrum to $10^{-10}$---particle
+number is conserved.
+\emph{(iv)}~For $V=0$ on $L=3,4$ the one-particle sector reproduces the
+tight-binding band $-2t[\cos k_x+\cos k_y]$ to $10^{-15}$; on the $2\times2$
+plaquette it gives the four-site ring $\{-2t,0,0,2t\}$.
+\emph{(v)}~$\Tr\hat H$ equals the summed interaction, since hopping is off
+diagonal.
+\emph{(vi)}~Ground-state energies from a sparse Lanczos solver agree with the
+dense spectra ($E_0/t=-10.347$ at $L=3$, $-18.000$ at $L=4$ for $V=0$).
+\emph{(vii)}~$C_V=\beta^2\Var(E)$ and $\partial_\mu\avg N=\beta\Var(N)$ match
+numerical derivatives of the means to $10^{-5}$.
+\emph{(viii)}~The limits come out right: $S\to\ln(\text{ground degeneracy})$ and
+$C_V\to0$ as $T\to0$; $S\to\ln(\dim)$ and $\avg E\to$ the spectral mean as
+$T\to\infty$.
 
 \section{Results}
-\subsection{Spectrum and density of states}
-Figure~\ref{fig:dos} shows the per-sector spectrum and total density of states
-for the $L=4$ free gas. The bounded spectrum with a central DOS maximum is the
-structural origin of the negative-temperature region and of the
-finite-difference thermometry failure.
+\subsection{Spectrum, heat capacity, filling}
+The spectrum is symmetric about zero and peaked in the middle
+(Fig.~\ref{fig:dos})---a bounded band with a large zero-energy degeneracy, both
+generic to bipartite hopping. The heat capacity is a single broad bump that
+vanishes at both ends of the temperature range (Fig.~\ref{fig:cv}); repulsion
+pushes the bump to higher $T$ and attraction to lower, tracking the change in the
+characteristic energy scale. The grand-canonical filling passes through
+half-filling at $\mu=0$ by particle--hole symmetry, and the $L=3,4$ curves have
+already nearly collapsed onto a common shape while $L=2$ still stands apart
+(Fig.~\ref{fig:fill}). Entropy per site climbs from zero at $T=0$---a
+non-degenerate ground state---to the infinite-temperature ceiling
+$\ln(\dim)/M$, which itself creeps up toward $\ln2$ as the lattice grows
+(Fig.~\ref{fig:entropy}).
+
 \begin{figure}[t]\centering
 \includegraphics[width=\columnwidth]{fig1_spectrum_dos.png}
 \caption{Eigenvalues per sector (left) and total density of states (right),
 $L=4$, $V=0$.}\label{fig:dos}
 \end{figure}
-
-\subsection{Heat capacity}
-The canonical heat capacity (Fig.~\ref{fig:cv}) shows a single broad
-Schottky-like peak, vanishing as $T\to0$ and $T\to\infty$. Repulsion shifts the
-peak to higher $T$, attraction to lower $T$, preserving the Schottky form.
 \begin{figure}[t]\centering
 \includegraphics[width=\columnwidth]{fig2_heat_capacity.png}
-\caption{Canonical $C_V(T)$ at half filling ($L=4$, $N=8$) for free, repulsive,
-and attractive gases.}\label{fig:cv}
+\caption{Canonical $C_V(T)$ at half filling ($L=4$, $N=8$).}\label{fig:cv}
 \end{figure}
-
-\subsection{Grand-canonical filling and fluctuations}
-Figure~\ref{fig:fill} shows filling versus $\mu$ at $\beta t=1$; all curves cross
-half filling at $\mu=0$ (particle--hole symmetry), with $L=3,4$ converging toward
-a common thermodynamic profile while $L=2$ deviates. Figure~\ref{fig:varn} shows
-$\mathrm{Var}(N)$ and the compressibility $\kappa\sim\mathrm{Var}(N)/\avg{N}^2$,
-peaking near half filling.
 \begin{figure}[t]\centering
 \includegraphics[width=\columnwidth]{fig3_mu_staircase.png}
-\caption{Grand-canonical filling versus $\mu/t$ at $\beta t=1$,
-$L=2,3,4$.}\label{fig:fill}
+\caption{Grand-canonical filling versus $\mu/t$ at $\beta t=1$.}\label{fig:fill}
 \end{figure}
-\begin{figure}[t]\centering
-\includegraphics[width=\columnwidth]{fig4_number_fluctuations.png}
-\caption{Number fluctuations and compressibility versus $\mu/t$ ($L=4$, $V=0$,
-$\beta t=1$).}\label{fig:varn}
-\end{figure}
-
-\subsection{Ensemble energy comparison}
-Figure~\ref{fig:eens} overlays canonical and grand-canonical energy per site at
-matched $\mu^{*}$ (so $\avg{N}=N$). They coincide as $T\to0$ and open a small gap
-at intermediate $T$---the finite-size inequivalence.
-\begin{figure}[t]\centering
-\includegraphics[width=\columnwidth]{fig5_energy_ensembles.png}
-\caption{Canonical versus grand-canonical energy per site at matched particle
-number ($L=4$, $N=8$, $V=0$).}\label{fig:eens}
-\end{figure}
-
-\subsection{Entropy and the caloric curve}
-The canonical entropy per site $S/M=\beta\avg{E}/M+\ln Z_N/M$
-(Fig.~\ref{fig:entropy}) rises from zero at $T\to0$ (a non-degenerate ground
-state; the third law) and saturates at the infinite-temperature ceiling
-$\ln(\dim)/M$. Attraction raises the entropy fastest and repulsion slowest,
-mirroring the heat-capacity peak positions. Figure~\ref{fig:caloric} makes the
-central methodological point graphically: the canonical caloric curve $T(E)$ is
-smooth and monotone on the lower half of the spectrum, whereas the
-microcanonical finite-difference temperature $1/(\partial S/\partial E)$
-scatters around it and, crucially, turns \emph{negative} above the band center
-($E\gtrsim0$)---the bounded spectrum's density-of-states maximum, where
-$\partial S/\partial E$ changes sign. This is precisely the regime in which a
-single-energy microcanonical thermometer fails, and it justifies anchoring the
-equivalence analysis on fluctuation metrics rather than on $\partial
-S/\partial E$.
 \begin{figure}[t]\centering
 \includegraphics[width=\columnwidth]{fig8_entropy_temperature.png}
-\caption{Canonical entropy per site $S/M$ versus temperature ($L=4$, $N=8$);
-dotted lines mark the $T\to\infty$ ceiling $\ln(\dim)/M$.}\label{fig:entropy}
-\end{figure}
-\begin{figure}[t]\centering
-\includegraphics[width=\columnwidth]{fig11_caloric_curve.png}
-\caption{Caloric curve $T(E)$: smooth canonical (line) versus microcanonical
-finite differences (crosses) for $L=4$, $N=8$, $\Delta E=0.75$. The
-microcanonical estimate is noisy and turns negative past the band center.}
-\label{fig:caloric}
+\caption{Entropy per site $S/M$; dotted lines mark $\ln(\dim)/M$.}\label{fig:entropy}
 \end{figure}
 
-\subsection{Finite-size scaling (central result)}
-Figure~\ref{fig:scaling} and Table~\ref{tab:fits} present the three equivalence
-metrics versus $M=L^2$ with power-law fits. Two conclusions stand out.
-\emph{(i) Equivalence emerges for free and repulsive gases}: all metrics
-decrease with size; the free-gas $r_N$ and $\Delta_E/M$ follow clean power laws
-($R^2=1.00$) with exponents between $-0.6$ and $-0.9$, bracketing the
-saddle-point expectation $M^{-1/2}$. \emph{(ii) Equivalence fails for the
-attractive gas in the number channel}: the $r_N$ decay exponent varies
-monotonically with interaction (Table~\ref{tab:fits}), from $p=-1.10$ at
-$V/t=+3$ (strong repulsion restores equivalence fastest) through $-0.64$ at
-$V=0$, up to $p=+0.13$ at $V/t=-3$. The sign change is the key result: for strong
-attraction the relative number fluctuation at $M=16$ reaches $0.96$ and its
-exponent turns \emph{positive}, so the canonical--grand mismatch \emph{grows}
-with system size rather than shrinking. This is the fingerprint of a developing
-clustering/phase-separation instability: the grand ensemble supports large
-number fluctuations between competing fillings that the fixed-$N$ canonical
-ensemble forbids, and the effect strengthens with size. The energy metrics
-($r_E$, $\Delta_E/M$) still shrink for all $V$---the inequivalence is specific to
-the particle-number channel, where the instability lives.
+\subsection{The caloric curve, and the thermometry problem}
+Figure~\ref{fig:caloric} is the clearest single picture of why the
+microcanonical temperature is not to be trusted here. The canonical $T(E)$,
+obtained by inverting the smooth $\avg E(T)$, rises cleanly through the lower half
+of the band. The finite-difference $1/(\partial S/\partial E)$ scatters around it
+below the band center and then goes negative above it. The negative values are
+not a bug---a bounded spectrum genuinely has negative-temperature states---but
+they make the slope useless as a thermometer at a single energy.
+\begin{figure}[t]\centering
+\includegraphics[width=\columnwidth]{fig11_caloric_curve.png}
+\caption{Caloric curve: smooth canonical $T(E)$ (line) against microcanonical
+finite differences (crosses), $L=4$, $N=8$, $\Delta E=0.75$.}\label{fig:caloric}
+\end{figure}
+
+\subsection{Matching the ensembles, and the finite-size trend}
+Fix $N$ and $\beta$, tune $\mu^\ast$ so $\avg N=N$, and the canonical and
+grand-canonical energies per site sit almost on top of each other, splitting by a
+small amount at intermediate temperature (Fig.~\ref{fig:eens}). That gap, and the
+two fluctuation ratios, are what we follow against size.
+
+Figure~\ref{fig:scaling} and Table~\ref{tab:fits} collect the three metrics
+versus $M$ for seven couplings. For the free gas and for repulsion all three fall
+with size; the free-gas $\sigma_N/\avg N$ and per-site gap follow clean power laws
+($R^2=1.00$) with exponents between $-0.6$ and $-0.9$, straddling the
+$M^{-1/2}$ that Eq.~\eqref{eq:relE} predicts. The energy ratio $\sigma_E/|\avg E|$
+is the noisiest of the three, as expected---it feels the bounded band and the
+discreteness of the smallest lattice most strongly.
+
+The attractive side behaves differently, and the difference is the main result.
+Reading down the $p(\sigma_N/\avg N)$ column of Table~\ref{tab:fits}, the decay
+exponent slides monotonically from $-1.10$ at $V/t=+3$, where repulsion restores
+equivalence fastest, through $-0.64$ for the free gas, up to $+0.13$ at
+$V/t=-3$. The sign flip is the point. At strong attraction the relative number
+fluctuation reaches $0.96$ on the largest lattice and its exponent is positive,
+so the canonical-to-grand mismatch \emph{grows} as the lattice grows. An
+attractive lattice gas wants to clump; the grand ensemble lets the particle
+number swing between the competing dilute and dense arrangements, and the
+fixed-$N$ canonical ensemble cannot follow. The energy metrics keep shrinking for
+every $V$, so the failure lives specifically in the particle-number channel,
+which is where the instability lives too.
+
+\begin{figure}[t]\centering
+\includegraphics[width=\columnwidth]{fig5_energy_ensembles.png}
+\caption{Canonical versus grand-canonical energy per site at matched $N$
+($L=4$, $N=8$, $V=0$).}\label{fig:eens}
+\end{figure}
 \begin{figure*}[t]\centering
 \includegraphics[width=0.92\textwidth]{fig6_scaling.png}
-\caption{Finite-size scaling of $r_E$, $r_N$, and $\Delta_E/M$ for seven
-couplings $V/t\in\{-3,\dots,+3\}$ (attractive blue, repulsive red) at
+\caption{Finite-size scaling of $\sigma_E/|\avg E|$, $\sigma_N/\avg N$, and the
+per-site energy gap for seven couplings (attractive blue, repulsive red),
 $\beta t=1$, half filling. Lines are power-law fits.}\label{fig:scaling}
 \end{figure*}
 
 \begin{table}[t]\centering\small
-\caption{Power-law exponents $p$ (fit $\propto M^{p}$, $M=4,9,16$) of each
-equivalence metric versus interaction, and the number fluctuation at the largest
-lattice $r_N(M{=}16)$. $\beta t=1$, half filling, periodic. The $r_N$ exponent
-rises monotonically and turns positive for strong attraction.}\label{tab:fits}
+\caption{Fitted exponents $p$ (metric $\propto M^{p}$, $M=4,9,16$) and the number
+fluctuation on the largest lattice, $\beta t=1$, half filling. The number-channel
+exponent rises steadily and turns positive at strong attraction.}\label{tab:fits}
 \begin{tabular}{rrrrr}
 \toprule
-$V/t$ & $p(r_E)$ & $p(r_N)$ & $p(\Delta_E/M)$ & $r_N(M{=}16)$\\
+$V/t$ & $p(\sigma_E/|\avg E|)$ & $p(\sigma_N/\avg N)$ & $p(\Delta_E/M)$ & $\sigma_N/\avg N\,(M{=}16)$\\
 \midrule
 $-3$ & $-0.92$ & $+0.13$ & $+0.51$ & 0.962\\
 $-2$ & $-0.88$ & $-0.12$ & $-0.59$ & 0.553\\
@@ -276,84 +345,78 @@ $+3$ & $-0.75$ & $-1.10$ & $-0.97$ & 0.035\\
 \end{table}
 
 \subsection{Interaction dependence}
-Figure~\ref{fig:vdep} collects the metrics at $L=4$ versus $V/t$ over seven
-couplings. A still denser sweep is cheap at fixed $L=3$: Fig.~\ref{fig:vsweep}
-resolves the full trend over $33$ values of $V/t$. The relative number
-fluctuation $\sigma_N/\avg{N}$ rises smoothly and monotonically toward unity as
-the interaction becomes more attractive---the continuous form of the
-canonical--grand breakdown driven by clustering---while the relative energy
-fluctuation grows instead with repulsion. The per-site energy gap stays small
-and develops shallow minima. The anomaly is thus specific to the number channel
-and to attraction, confirming it as a genuine physical effect rather than a
-fitting artifact.
+Plotting the metrics at $L=4$ against $V/t$ lays the trend bare
+(Fig.~\ref{fig:vdep}): $\sigma_N/\avg N$ falls monotonically from nearly $1$ at
+$V/t=-3$ to a few percent at $V/t=+3$, crossing the energy ratio near $V=0$. A
+finer sweep at fixed $L=3$, where each coupling is almost free to compute,
+resolves the same curve over $33$ points and shows it is smooth
+(Fig.~\ref{fig:vsweep}).
 \begin{figure}[t]\centering
 \includegraphics[width=\columnwidth]{fig7_interaction.png}
-\caption{Equivalence metrics at $L=4$ versus $V/t$ (seven couplings). The number
-fluctuation $\sigma_N/\avg{N}$ falls monotonically from $\sim\!1$ (strong
-attraction) to $\sim\!0$ (strong repulsion).}\label{fig:vdep}
+\caption{Equivalence metrics at $L=4$ versus $V/t$, seven
+couplings.}\label{fig:vdep}
 \end{figure}
 \begin{figure}[t]\centering
 \includegraphics[width=\columnwidth]{fig12_interaction_sweep.png}
-\caption{Dense interaction sweep at fixed $L=3$ ($33$ couplings, open BC,
-$\beta t=1$): $\sigma_N/\avg{N}$ grows toward unity with attraction, the
-number-channel signature of ensemble inequivalence.}\label{fig:vsweep}
+\caption{A denser sweep at fixed $L=3$ ($33$ couplings, open BC, $\beta t=1$):
+$\sigma_N/\avg N$ climbs smoothly toward unity with attraction.}\label{fig:vsweep}
 \end{figure}
 
+\subsection{What to distrust}
+Three sizes make for soft exponents, and the smallest point does the most to tilt
+a fit. It also happens to be the oddest lattice: the $L=2$ torus de-duplicates to
+a single-bonded four-site ring instead of the true double-bonded two-torus, with
+a one-particle band $\{-2t,0,0,2t\}$ rather than the $-4t$ bandwidth minimum. The
+$L=3$ torus has its own quirk---an odd period makes it non-bipartite, so it loses
+the $E\leftrightarrow-E$ spectral symmetry that $L=2$ and $L=4$ keep, though the
+$N\leftrightarrow M-N$ symmetry that pins $\avg N=M/2$ at $\mu=0$ survives at
+every size. The $L=2,3,4$ sequence is therefore three somewhat different
+geometries stitched together, and some of the scatter in Table~\ref{tab:fits} is
+that stitching rather than physics. An open-boundary sequence, bipartite at every
+size, or an even-$L$ series would be cleaner at the price of stronger edges.
+Everything here is at one temperature, $\beta t=1$.
+
 \section{Discussion}
-\textbf{Why fluctuations, not thermometry.} The canonical distribution is the
-Laplace transform of the microcanonical density of states, and equivalence is the
-statement that this transform is saddle-point dominated. The width
-$\sigma_E/|\avg{E}|$ measures saddle sharpness directly; it is a smooth spectral
-sum, free of the differentiation noise that cripples $\partial S/\partial E$ on a
-discrete spectrum. The same holds for $\sigma_N/\avg{N}$. The fluctuation metrics
-are thus both robust and correct.
+The choice to measure equivalence through fluctuations rather than through a
+matched temperature is not a workaround; it is the content of the saddle-point
+argument in Sec.~III\,D. Equivalence \emph{is} the statement that the Laplace
+transform relating the ensembles is dominated by a sharp saddle, and the width of
+that saddle is exactly $\sigma_E/|\avg E|$. The quantity we can compute cleanly is
+the quantity that was physically at issue all along.
 
-\textbf{The attractive anomaly.} An attractive nearest-neighbor interaction
-lowers the energy of clustered configurations, driving a low-temperature
-tendency toward phase separation. In the grand ensemble this yields a broad
-$P(N)$ with large $\mathrm{Var}(N)$ that does not self-average at these sizes;
-the canonical ensemble, with $N$ pinned, cannot access the competing fillings, so
-the ensembles disagree. This is the finite-size precursor of the thermodynamic
-failure of equivalence at first-order transitions.
+The attractive anomaly reads naturally as the finite-size shadow of a first-order
+transition. Phase coexistence is the standard place where ensemble equivalence
+breaks even in the thermodynamic limit, because the microcanonical entropy loses
+concavity and the Maxwell construction separates the ensembles. We do not have a
+transition on $16$ sites, but we have its precursor: a number distribution broad
+enough that fixing $\mu$ and fixing $N$ stop being interchangeable, and broadening
+rather than sharpening as the lattice grows.
 
-\textbf{Limitations.} With only $M=4,9,16$, the exponents are indicative, not
-precise, and the $M=4$ point leverages the fits---doubly so because the $L=2$
-periodic lattice de-duplicates to a single-bonded four-site ring rather than the
-true double-bonded two-torus (its $N=1$ band is $\{-2t,0,0,2t\}$ instead of the
-dispersion minimum $-4t$), so it is a slightly different lattice from the $L=3,4$
-members of the sequence. The $L=3,4$ single-particle spectra reproduce the exact
-tight-binding band $-2t[\cos k_x+\cos k_y]$ to machine precision. A related
-geometric subtlety: under periodic boundaries the square lattice is bipartite
-(and hence has an $E\leftrightarrow-E$ spectral symmetry) only for \emph{even}
-$L$; the $L=3$ torus is frustrated and non-bipartite, so its spectrum lacks that
-symmetry, whereas the particle--hole map $N\!\leftrightarrow\!M-N$ (which fixes
-$\avg{N}=M/2$ at $\mu=0$) survives for all $L$. The $L=2,3,4$ periodic sequence
-therefore mixes three geometries (ring, frustrated torus, bipartite torus),
-which contributes to the scatter in the fitted exponents; an open-boundary
-sequence (bipartite at every $L$) or an even-$L$ series would be cleaner at the
-cost of stronger edge effects. Independent validation (Lanczos ground states,
-the fluctuation identities $C_V=\beta^2\mathrm{Var}(E)$ and
-$\partial_\mu\avg{N}=\beta\mathrm{Var}(N)$ against numerical derivatives, and the
-$T\to\infty$ entropy) confirms the ensemble machinery to $10^{-5}$ or better.
-Results are at a single temperature $\beta t=1$; the microcanonical $T,\mu$ are
-reported only as a window-sensitive diagnostic; the bounded spectrum admits
-negative-temperature states that the fluctuation metrics sidestep. The dense
-interaction sweep of Fig.~\ref{fig:vsweep} is computed at fixed $L=3$ (open
-boundaries), where many $V/t$ values are inexpensive.
+What would sharpen the picture is more sizes and a temperature axis. The exponents
+in Table~\ref{tab:fits} are suggestive, not converged, and the whole table lives
+at $\beta t=1$; the rate at which equivalence sets in surely depends on
+temperature, and mapping that dependence is the obvious next step. Reaching $L=5$
+would need symmetry-reduced diagonalization, since the half-filled sector there is
+already five million states.
 
 \section{Conclusion}
-Using numerically exact diagonalization of the 2D hard-core Bose--Hubbard model,
-we gave a transparent, reproducible account of how ensemble equivalence emerges
-with system size in an interacting quantum lattice gas. By recognizing the
-ill-conditioning of finite-difference microcanonical thermometry and instead
-measuring equivalence through robust fluctuation observables, we demonstrated
-monotone power-law convergence for the free and repulsive gases and a clear
-breakdown of canonical--grand equivalence in the number channel for the
-attractive gas---the finite-size signature of its phase-separation instability.
+Built from one spectrum, the three ensembles of a small quantum lattice gas agree
+to a degree that improves with size for repulsive and non-interacting particles
+and fails to improve---indeed worsens---for strongly attractive ones, the failure
+confined to the particle-number channel where the gas would rather phase separate.
+Getting there required recognizing that the microcanonical thermometer breaks on
+small bounded spectra and measuring equivalence through its fluctuations instead,
+which is both what works numerically and what the saddle-point picture says to
+measure.
 
 \paragraph{Author contributions.} P.\ Das, A.\ Shakya, and D.\ Thakur conceived
 the study, developed the exact-diagonalization and ensemble framework, performed
 the calculations and analysis, and wrote the manuscript.
+
+\paragraph{Reproducibility.} Each cached spectrum and figure records the
+generating configuration ($t$, $V$, $L$, boundary condition, grids, $\Delta E$).
+Spectra are built once and the analysis reads the cache; the validation checks of
+Sec.~IV run as a test suite.
 
 \begin{thebibliography}{9}
 \small
