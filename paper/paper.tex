@@ -322,12 +322,24 @@ periodic lattice de-duplicates to a single-bonded four-site ring rather than the
 true double-bonded two-torus (its $N=1$ band is $\{-2t,0,0,2t\}$ instead of the
 dispersion minimum $-4t$), so it is a slightly different lattice from the $L=3,4$
 members of the sequence. The $L=3,4$ single-particle spectra reproduce the exact
-tight-binding band $-2t[\cos k_x+\cos k_y]$ to machine precision. Results are at a
-single temperature $\beta t=1$; the microcanonical $T,\mu$ are reported only as a
-window-sensitive diagnostic; the bounded spectrum admits negative-temperature
-states that the fluctuation metrics sidestep. The dense interaction sweep of
-Fig.~\ref{fig:vsweep} is computed at fixed $L=3$ (open boundaries), where many
-$V/t$ values are inexpensive.
+tight-binding band $-2t[\cos k_x+\cos k_y]$ to machine precision. A related
+geometric subtlety: under periodic boundaries the square lattice is bipartite
+(and hence has an $E\leftrightarrow-E$ spectral symmetry) only for \emph{even}
+$L$; the $L=3$ torus is frustrated and non-bipartite, so its spectrum lacks that
+symmetry, whereas the particle--hole map $N\!\leftrightarrow\!M-N$ (which fixes
+$\avg{N}=M/2$ at $\mu=0$) survives for all $L$. The $L=2,3,4$ periodic sequence
+therefore mixes three geometries (ring, frustrated torus, bipartite torus),
+which contributes to the scatter in the fitted exponents; an open-boundary
+sequence (bipartite at every $L$) or an even-$L$ series would be cleaner at the
+cost of stronger edge effects. Independent validation (Lanczos ground states,
+the fluctuation identities $C_V=\beta^2\mathrm{Var}(E)$ and
+$\partial_\mu\avg{N}=\beta\mathrm{Var}(N)$ against numerical derivatives, and the
+$T\to\infty$ entropy) confirms the ensemble machinery to $10^{-5}$ or better.
+Results are at a single temperature $\beta t=1$; the microcanonical $T,\mu$ are
+reported only as a window-sensitive diagnostic; the bounded spectrum admits
+negative-temperature states that the fluctuation metrics sidestep. The dense
+interaction sweep of Fig.~\ref{fig:vsweep} is computed at fixed $L=3$ (open
+boundaries), where many $V/t$ values are inexpensive.
 
 \section{Conclusion}
 Using numerically exact diagonalization of the 2D hard-core Bose--Hubbard model,
