@@ -19,6 +19,21 @@ paper/*.aux
 paper/*.log
 paper/*.out
 paper/b*.log
+slides/*.aux
+slides/*.log
+slides/*.out
+slides/*.nav
+slides/*.snm
+slides/*.toc
+slides/*.vrb
+
+# Local-only working notes and agent guidance (kept out of the repo)
+OBJECTIVE.md
+PLAN.md
+RESEARCHER.md
+WRITING.md
+ppt.md
+CLAUDE.md
 
 # OS / editor
 .DS_Store

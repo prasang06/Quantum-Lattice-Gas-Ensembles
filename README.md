@@ -44,6 +44,7 @@ scripts/       run_spectra, run_scaling, make_figures, make_animations, run_app
 tests/         the validation + verification suite
 theory/        physics derivations (start at theory/README.md)
 paper/         the write-up (paper.tex, paper.pdf)
+slides/        presentation deck (Beamer/Metropolis: talk.tex, talk.pdf)
 figures/       generated figures
 animations/    generated GIFs
 ```
