@@ -136,6 +136,7 @@
     \item ground states match a sparse Lanczos solver
     \item $C_V=\beta^2\mathrm{Var}(E)$, $\partial_\mu\avg N=\beta\mathrm{Var}(N)$ vs numerical derivatives ($10^{-5}$)
     \item $T\to0,\infty$ limits of $S$ and $C_V$
+    \item exact limits of $\sigma_N/\avg N$: binomial as $\beta\to0$; $\sqrt{(M+2)/3M}$ at $V=-2t$, $T\to0$ (to $10^{-9}$)
   \end{itemize}
   \speaker{Aryan}
 \end{frame}
@@ -184,15 +185,72 @@
 
       At $V/t=-3$ the exponent is \textbf{positive}: the mismatch \emph{grows} with
       size --- the gas wants to phase separate.
+
+      \vspace{0.4em}
+      {\footnotesize All at one temperature, $\beta t=1$. Is this physics, or a
+      finite-size accident?}
     \end{column}
   \end{columns}
   \speaker{Dhruv}
 \end{frame}
 
+\begin{frame}{What theory predicts for the number channel}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \textbf{No hopping} ($t=0$): $\hat n_i=\tfrac{1+s_i}{2}$ gives an Ising model,
+      $J=|V|/4$. Onsager:
+      \[ T_c\approx0.567\,|V| \quad(1.70\,t \text{ at } V=-3t) \]
+      Below $T_c$: dense \emph{or} dilute, so
+      $\sigma_N/\avg N\to m_0(T)$ --- \textbf{size independent}.
+
+      \vspace{0.3em}
+      \textbf{Hot} ($\beta\to0$): binomial, exactly $M^{-1/2}$.
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \textbf{With hopping}: $\hat b^\dagger=\hat S^+$ gives an XXZ ferromagnet,
+      \[ J_z=|V|,\qquad J_{xy}=2t. \]
+      \begin{itemize}
+        \item $V<-2t$: easy axis $\Rightarrow$ phase separation
+        \item $V=-2t$: Heisenberg point, $T_c=0$
+        \item $-2t<V<0$: easy plane, superfluid
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vspace{0.3em}
+  \begin{alertblock}{Prediction}
+    The anomaly needs $V<-2t$ \emph{and} $T$ below a $T_c$ that is at most $0.567|V|$.
+  \end{alertblock}
+  \speaker{Dhruv}
+\end{frame}
+
+\begin{frame}{Adding a temperature axis}
+  \begin{center}
+    \includegraphics[width=\linewidth]{fig13_temperature_exponents.png}
+  \end{center}
+  {\small Fit $M=4,9,16$ at $40$ temperatures, $T/t=0.2$--$10$. Hot: every coupling
+  heads to $-1/2$ (binomial gives $-0.49$ on these sizes). Cold: attraction pulls
+  the exponent up toward $0$, and only $V/t=-3$ crosses it.}
+  \speaker{Dhruv}
+\end{frame}
+
+\begin{frame}{The anomaly lives where theory puts it}
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{fig14_number_channel_temperature.png}
+  \end{center}
+  \vspace{-0.8em}
+  {\small
+  \begin{itemize}
+    \item $V/t=-3$: exponent $>0$ only below $T\approx1.9\,t$; classical $T_c=1.70\,t$
+    \item $V/t=-2$: never positive; plateaus at the Heisenberg value $\sqrt{18/48}=0.612$
+    \item signature: exponent stuck near $0$ rather than $-1/2$ (either sign)
+  \end{itemize}}
+  \speaker{Dhruv}
+\end{frame}
+
 \begin{frame}[standout]{Takeaway}
   The ensembles converge for free and repulsive particles,
-  and \emph{diverge} for attractive ones --- in the particle number, where
-  phase separation lives.
+  and \emph{fail to} for attractive ones --- in the particle number, where
+  phase separation lives: below its $T_c$, and only for $V<-2t$.
 
   \vspace{0.5em}
   Measured through fluctuations, because the microcanonical thermometer fails on
