@@ -22,7 +22,7 @@ def tilted_figures(args) -> None:
     by_V_M = {V: d for V, d in by_V_M.items() if len(d) >= 2}
     if not by_V_M:
         raise SystemExit("no cached cluster spectra; run scripts/run_spectra.py --clusters ...")
-    label = " (tilted bipartite clusters)"
+    label = ", tilted bipartite clusters"
     T = np.geomspace(args.T_min, args.T_max, args.T_num)
     sweeps = {V: temperature_sweep(d, 1.0 / T, args.filling) for V, d in by_V_M.items()}
     M_largest = min(max(d) for d in by_V_M.values())

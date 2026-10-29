@@ -40,9 +40,9 @@ over the spectrum: the relative energy fluctuation $\sigma_E/|\avg E|$ and the
 relative particle-number fluctuation $\sigma_N/\avg N$, both of which fall as
 $1/\sqrt M$ when the ensembles converge. For the free gas and for repulsion they
 do fall, with fits close to that rate. Attraction is different. The number
-fluctuation stays large, and for $V/t=-3$ its finite-size exponent is
-positive---the canonical-to-grand mismatch \emph{grows} with the lattice rather
-than shrinking, which is what a lattice gas on the verge of phase separation
+fluctuation stays large, and for $V/t=-3$ its finite-size exponent on these
+three lattices is positive---the canonical-to-grand mismatch does not shrink with
+the lattice, which is what a lattice gas on the verge of phase separation
 should do. Sweeping $V/t$ from $-3$ to $+3$ turns this into a single monotonic
 curve in the number channel. Repeating the scaling at every temperature from
 $T/t=0.2$ to $10$ confines the anomaly to low temperature: at $V/t=-3$ the
@@ -50,6 +50,11 @@ exponent is positive only below $T\approx1.9\,t$, close to the $T_c\approx1.70\,
 at which the hopping-free gas, an Ising model, phase separates. Mapping the model
 onto an XXZ ferromagnet explains why $V/t=-2$, its isotropic Heisenberg point,
 never turns positive, and predicts its low-temperature number fluctuation exactly.
+Finally, we redo the scaling on one geometry: tilted bipartite clusters of $8$ to
+$20$ sites, reached with translation, point-group, and particle--hole symmetry.
+There every coupling gives exactly $-0.500$ at high temperature and the free gas
+$-0.47$ at $T=t$, while at $V/t=-3$ the exponent is $0.00$: the number
+fluctuation does not grow, it stops shrinking, as the Ising picture predicts.
 \vspace{1em}
 \end{minipage}
 \end{center}
@@ -105,6 +110,24 @@ up to $2^M$. The canonical and grand-canonical sums run over the whole spectrum,
 not a few low-lying states, so we diagonalize each block densely rather than with
 a Lanczos method. The half-filled sector sets the cost: $\binom{16}{8}=12\,870$
 for $L=4$, a few minutes on a workstation. We cache the spectra once.
+
+The $L\times L$ tori are not the only periodic square lattices. Identifying sites
+that differ by integer combinations of two vectors $\mathbf a_1,\mathbf a_2$
+gives a cluster of $M=|\det[\mathbf a_1\,\mathbf a_2]|$ sites; it is bipartite
+when both vectors have even $x+y$, and every site keeps four distinct neighbors
+when the cluster is not too small. We use $\mathbf a_1,\mathbf a_2=(2,2),(2,-2)$;
+$(3,1),(1,-3)$; $(4,0),(0,4)$; $(3,3),(3,-3)$; $(4,2),(2,-4)$, for
+$M=8,10,16,18,20$. All five are bipartite with coordination four, and all are
+even, so half filling is exact; $M=16$ is the $4\times4$ torus again. The $2\times2$
+torus fails the coordination test (it is a four-site ring) and $3\times3$ is not
+bipartite. To reach $M=20$, whose half-filled sector has $184\,756$ states, we
+block-diagonalize each $N$-sector by momentum: projecting the sector Hamiltonian
+onto Bloch states $\sum_{\mathbf r}e^{-i\mathbf k\cdot\mathbf r}\hat T_{\mathbf
+r}|a\rangle$ leaves $M$ blocks of about $\binom MN/M$ states. Momenta related by
+a rotation or reflection that maps the cluster to itself share a spectrum, so one
+block per star suffices, and particle--hole symmetry, $E_{M-N}=E_N+V(2M-4N)$,
+supplies the sectors with $N>M/2$. The largest dense block is then $9\,278$
+states, and a full $M=20$ spectrum takes about $15$ minutes.
 
 \section{The three ensembles}
 Everything below starts from one object: the set of eigenvalues $E_{N,\alpha}$,
@@ -295,6 +318,12 @@ $T\to\infty$.
 \emph{(ix)}~The limits of Sec.~\ref{sec:limits} come out of the full spectra:
 Eq.~\eqref{eq:binomial} at $\beta t=10^{-4}$ for repulsion, attraction, and the
 free gas, and Eq.~\eqref{eq:heis} at $V=-2t$ to $10^{-9}$ ($0.6124$ at $M=16$).
+\emph{(x)}~The symmetry-reduced spectra of the tilted clusters equal direct dense
+diagonalization to $10^{-13}$ in every sector for $M=8,10$, including the sectors
+obtained by particle--hole symmetry, and the $M=16$ cluster reproduces the
+$4\times4$ torus. Bloch bases are orthonormal and their dimensions add up to
+$\binom MN$; the one-particle sector reproduces $-2t[\cos k_x+\cos k_y]$ on each
+cluster's allowed momenta.
 
 \section{Results}
 \subsection{Spectrum, heat capacity, filling}
@@ -468,6 +497,68 @@ Right: the number-channel exponent over the $(V,T)$ plane, with its zero contour
 (solid), the classical $T_c$ (dashed), and $V=-2t$ (dotted).}\label{fig:tnum}
 \end{figure*}
 
+\subsection{One geometry: tilted clusters to 20 sites}\label{sec:tilted}
+Table~\ref{tab:tilted} and Figs.~\ref{fig:tscaling}--\ref{fig:tnum-tilted}
+repeat the analysis on the five bipartite clusters. The number channel becomes
+clean. At high temperature every coupling gives $-0.500$, the binomial value,
+because every cluster sits exactly at half filling. At $T=t$ the free gas gives
+$-0.47$ and $V/t=\pm1$ give $-0.45$, each with $R^2=1.000$; the free-gas value on
+the square tori, $-0.64$, was tilted by the four-site ring and the off-half-filled
+$3\times3$ lattice.
+
+At $V/t=-3$ the exponent is $+0.02$ at $T=t$ and $0.00$ below $T\approx0.5\,t$,
+with $\sigma_N/\avg N=0.965$ on $20$ sites. It stays within $0.05$ of zero up to
+$T\approx1.5\,t$ and passes $-0.25$ near $T\approx2.1\,t$, bracketing the
+classical $T_c=1.70\,t$. This is the size-independent plateau that
+Sec.~\ref{sec:limits} predicts below $T_c$; the positive $+0.13$ of
+Table~\ref{tab:fits} was mostly a property of the three-geometry fit. $V/t=-2$
+approaches the Heisenberg value from above, with exponent $-0.07$ at the lowest
+temperature and $\sigma_N/\avg N=0.6055$ on $20$ sites at $T=0.2\,t$, equal to
+$\sqrt{22/60}$ from Eq.~\eqref{eq:heis}.
+
+The energy channel changes more. The per-site gap falls as $M^{-0.9}$ to
+$M^{-1.0}$ for $|V|\le t$ at $T=t$ ($R^2\ge0.999$), and as $M^{-1.05}$ to
+$M^{-1.25}$ for every coupling at $T=5\,t$. That is faster than $M^{-1/2}$, and it should be:
+canonical and grand-canonical means differ by an $\mathcal O(1)$ amount, so
+$\Delta\avg E/M\sim M^{-1}$. The relative energy fluctuation, by contrast, is
+nearly flat at $T=t$ ($-0.06$ for the free gas): the energy variance per site
+still grows from $8$ to $20$ sites, which cancels the $1/\sqrt M$. At $T=10\,t$
+its exponents lie between $-0.46$ and $-0.72$ for every coupling; the repulsive
+ones get there through zero-crossing spikes near $T\approx2$--$3\,t$. The $-0.89$ of Table~\ref{tab:fits} came
+almost entirely from the four-site ring, where $\sigma_E/|\avg E|=0.50$ against
+about $0.16$ on every larger lattice.
+
+\begin{table}[t]\centering\small
+\caption{Fitted exponents at $\beta t=1$, half filling, on the square tori
+($M=4,9,16$; Table~\ref{tab:fits}) and on the bipartite tilted clusters
+($M=8,10,16,18,20$).}\label{tab:tilted}
+\begin{tabular}{rrrrr}
+\toprule
+& \multicolumn{2}{c}{$p(\sigma_N/\avg N)$} & \multicolumn{2}{c}{tilted} \\
+$V/t$ & square & tilted & $p(\Delta_E/M)$ & $\sigma_N/\avg N\,(M{=}20)$\\
+\midrule
+$-3$ & $+0.13$ & $+0.02$ & $+0.10$ & 0.965\\
+$-2$ & $-0.12$ & $-0.19$ & $+0.50$ & 0.529\\
+$-1$ & $-0.55$ & $-0.45$ & $-0.90$ & 0.216\\
+$0$  & $-0.64$ & $-0.47$ & $-0.94$ & 0.148\\
+$+1$ & $-0.65$ & $-0.45$ & $-0.98$ & 0.115\\
+$+2$ & $-0.69$ & $-0.38$ & $-0.37$ & 0.084\\
+$+3$ & $-1.10$ & $-0.66$ & $-0.11$ & 0.030\\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{figure*}[t]\centering
+\includegraphics[width=0.92\textwidth]{fig6b_scaling_tilted.png}
+\caption{As Fig.~\ref{fig:scaling}, on the tilted bipartite clusters
+$M=8,10,16,18,20$.}\label{fig:tscaling}
+\end{figure*}
+\begin{figure*}[t]\centering
+\includegraphics[width=0.92\textwidth]{fig14b_number_channel_temperature_tilted.png}
+\caption{As Fig.~\ref{fig:tnum}, on the tilted clusters; left panel at $M=20$.
+The attractive zero contour now hugs $V/t=-3$ below $T\approx1.3\,t$: the
+exponent there is zero, not positive.}\label{fig:tnum-tilted}
+\end{figure*}
+
 \subsection{What to distrust}
 Three sizes make for soft exponents, and the smallest point does the most to tilt
 a fit. It also happens to be the oddest lattice: the $L=2$ torus de-duplicates to
@@ -482,16 +573,23 @@ that stitching rather than physics. An open-boundary sequence, bipartite at ever
 size, or an even-$L$ series would be cleaner at the price of stronger edges.
 The stitching is visible even with no physics in it: the binomial law of
 Eq.~\eqref{eq:binomial}, fitted on $M=4$ and $9$ alone (where $N=4$, off half
-filling), gives an exponent of $-0.36$, not $-0.5$.
+filling), gives an exponent of $-0.36$, not $-0.5$. The tilted clusters of
+Sec.~\ref{sec:tilted} remove this problem, and where the two families disagree we trust the
+tilted one.
 
 The temperature sweep adds two caveats. Below $T\approx0.3\,t$ the $V/t=+1$ and
-$+2$ number exponents turn positive, to $+0.6$; the fluctuations there are a few
-percent at most, each lattice's finite-size gap suppresses them by a different
-amount, and the odd $L=3$ torus frustrates the checkerboard order that repulsion
-favors. This is a finite-size artifact, not an instability. Second,
+$+2$ number exponents turn positive, to $+0.6$ on the square tori and $+1.9$ on
+the tilted clusters. The fluctuations there are a few percent at most and are
+set by each lattice's charge gap, which has not converged at these sizes; $V=+2t$
+is also the onset of checkerboard order at half filling. That it survives on the
+bipartite clusters rules out frustration on $3\times3$ as the cause. It is a
+finite-size artifact, not an instability. Second,
 $\sigma_E/|\avg E|$ divides by an energy that passes through zero for the
 repulsive gas near $T\approx2$--$3\,t$, which produces the spikes in
-Fig.~\ref{fig:texp}; $\sigma_E/M$ would avoid this.
+Fig.~\ref{fig:texp}; $\sigma_E/M$ would avoid this. At low temperature the
+level spacing also suppresses the energy fluctuation more on smaller lattices,
+so the energy-ratio exponent is only meaningful above $T\approx2\,t$ at these
+sizes.
 
 \section{Discussion}
 The choice to measure equivalence through fluctuations rather than through a
@@ -515,22 +613,25 @@ temperature close to the classical $T_c$, and only on the easy-axis side of the
 XXZ map, $V<-2t$. It also clarifies what the signature is. Phase separation
 does not make the number fluctuation grow without bound; it makes it stop
 shrinking, an exponent near zero, and on small lattices the approach to that
-plateau can come from below (a positive fitted exponent, $V/t=-3$) or from above
-(a slightly negative one, $V/t=-2$). The sign alone is not the diagnostic. What
-separates the attractive side from the rest is that its exponent sits far from
-$-1/2$ at low temperature, where the free and repulsive exponents do not.
+plateau can come from below or from above (a slightly negative exponent,
+$V/t=-2$). The tilted clusters confirm this: on one geometry the $V/t=-3$
+exponent is zero to two decimals below $T\approx t$, and the positive value on
+the square tori was a fitting artifact. The sign alone is not the diagnostic.
+What separates the attractive side from the rest is that its exponent sits far
+from $-1/2$ at low temperature, where the free and repulsive exponents do not.
 
-What would sharpen the picture now is more sizes, on lattices that share one
-geometry. The exponents are fitted on three lattices of three different shapes.
-Going to $L=5$ would not fix this, since a $5\times5$ torus is as non-bipartite
-as $3\times3$; tilted square clusters of $8$, $10$, $16$, $18$, and $20$ sites are
-all bipartite, and with translation symmetry the largest needs blocks of only
-about $9\,000$ states.
+The next limit is size. A $26$-site cluster has half-filled momentum blocks of
+about $400\,000$ states, out of reach for dense full-spectrum diagonalization;
+going further means giving up the full spectrum, for instance with a
+sign-free quantum Monte Carlo method for the canonical and grand ensembles, at
+the cost of the microcanonical one. At the sizes we have, the number channel is
+converged enough to be read quantitatively; the energy ratio is not, below
+$T\approx2\,t$.
 
 \section{Conclusion}
 Built from one spectrum, the three ensembles of a small quantum lattice gas agree
 to a degree that improves with size for repulsive and non-interacting particles
-and fails to improve---indeed worsens---for strongly attractive ones, the failure
+and fails to improve for strongly attractive ones, the failure
 confined to the particle-number channel where the gas would rather phase separate.
 Getting there required recognizing that the microcanonical thermometer breaks on
 small bounded spectra and measuring equivalence through its fluctuations instead,
@@ -538,7 +639,9 @@ which is both what works numerically and what the saddle-point picture says to
 measure. A temperature sweep places the failure below the phase-separation
 temperature of the hopping-free gas and on the easy-axis side of the XXZ map,
 $V<-2t$, and the high-temperature and Heisenberg-point limits are reproduced
-exactly.
+exactly. On a single family of bipartite clusters up to $20$ sites the free-gas
+number fluctuation falls as $M^{-0.47}$, and the strongly attractive one does not
+fall at all.
 
 \paragraph{Author contributions.} P.\ Das, A.\ Shakya, and D.\ Thakur conceived
 the study, developed the exact-diagonalization and ensemble framework, performed
