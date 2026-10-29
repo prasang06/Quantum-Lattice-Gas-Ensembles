@@ -401,7 +401,9 @@ def fig_temperature_exponents(sweeps: dict[float, dict[str, np.ndarray]], fillin
     axes[0].legend(fontsize=7)
     fig.suptitle(
         rf"Finite-size exponents vs temperature ($M=4,9,16$, filling $={filling:g}$; "
-        r"dashed: $M^{-1/2}$, dotted: classical Onsager $T_c$)",
+        r"dashed: $M^{-1/2}$, dotted: classical Onsager $T_c$)" "\n"
+        r"spikes in the middle and right panels are where the metric crosses zero "
+        r"($\langle E\rangle$ or $\Delta\langle E\rangle$ changes sign), not physics",
         y=1.03,
     )
     fig.tight_layout()
@@ -448,9 +450,12 @@ def fig_number_channel_temperature(sweeps: dict[float, dict[str, np.ndarray]], M
     mesh = ax1.pcolormesh(np.array(Vs), T, P.T, shading="nearest", cmap="RdBu_r",
                           vmin=-vmax, vmax=vmax)
     ax1.contour(np.array(Vs), T, P.T, levels=[0.0], colors="black", linewidths=1.5)
-    Vneg = np.linspace(min(Vs), 0, 50)
-    ax1.plot(Vneg, [ising_critical_temperature(v) for v in Vneg], "k--", lw=1,
-             label=r"classical $T_c=0.567|V|$")
+    # Classical T_c, clipped to the plotted temperature range (it -> 0 at V = 0).
+    Vneg = np.linspace(min(Vs), 0, 200)
+    Tc = np.array([ising_critical_temperature(v) for v in Vneg])
+    keep = Tc >= T.min()
+    ax1.plot(Vneg[keep], Tc[keep], "k--", lw=1, label=r"classical $T_c=0.567|V|$")
+    ax1.set_ylim(T.min(), T.max())
     ax1.axvline(-2.0, color="black", ls=":", lw=1, label=r"Heisenberg point $V=-2t$")
     ax1.set_yscale("log")
     ax1.set_xlabel("interaction $V/t$")
