@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 
 from qlge.benchmarks import (
+    heisenberg_number_fluctuation,
     infinite_temperature_number_fluctuation,
     ising_critical_temperature,
     ising_number_fluctuation,
@@ -65,3 +66,13 @@ def test_classical_gas_tracks_ising_below_tc():
     r = match_ensembles(spec, 4, beta=1.0 / T)
     assert r.rel_number_fluctuation > 0.9 * float(ising_number_fluctuation(-4.0, T))
     assert r.rel_number_fluctuation > 2 * float(infinite_temperature_number_fluctuation(9, 4))
+
+
+@pytest.mark.parametrize("bc", ["periodic", "open"])
+def test_heisenberg_point_ground_multiplet(bc):
+    # V = -2t is an SU(2) ferromagnet: at T -> 0 the grand ensemble is uniform
+    # over the M + 1 states of the ground multiplet, one per N-sector.
+    spec = diagonalize(RunConfig(L=2, V=-2.0, bc=bc))
+    r = match_ensembles(spec, 2, beta=30.0)
+    assert r.rel_number_fluctuation == pytest.approx(float(heisenberg_number_fluctuation(4)), rel=1e-8)
+    assert float(heisenberg_number_fluctuation(10**8)) == pytest.approx(1 / np.sqrt(3), rel=1e-6)

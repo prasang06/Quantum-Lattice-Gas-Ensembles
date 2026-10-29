@@ -421,6 +421,7 @@ def fig_number_channel_temperature(sweeps: dict[float, dict[str, np.ndarray]], M
     convergence from the phase-separation anomaly.
     """
     from qlge.benchmarks import (
+        heisenberg_number_fluctuation,
         infinite_temperature_number_fluctuation,
         ising_critical_temperature,
         ising_number_fluctuation,
@@ -437,6 +438,9 @@ def fig_number_channel_temperature(sweeps: dict[float, dict[str, np.ndarray]], M
                      label=f"$V/t={V:+g}$")
         if V < 0:
             ax0.semilogx(Tfine, ising_number_fluctuation(V, Tfine), "--", color=color, lw=1)
+        if V == -2.0 and M_largest % 2 == 0:
+            ax0.plot(T[T < 1.0], np.full((T < 1.0).sum(), float(heisenberg_number_fluctuation(M_largest))),
+                     "-.", color="black", lw=1, label=r"$V=-2t$, $T\to0$: $\sqrt{(M+2)/3M}$")
     N = max(1, min(M_largest - 1, round(filling * M_largest)))
     ax0.axhline(float(infinite_temperature_number_fluctuation(M_largest, N)), color="gray",
                 lw=0.8, ls=":", label=r"$\beta\to0$ binomial")

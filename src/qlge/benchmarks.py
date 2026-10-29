@@ -35,6 +35,16 @@ Three limits bracket what sigma_N/<N> should do, independently of ED:
    it is easy-plane (superfluid, no phase separation). Hopping therefore lowers
    T_c below the classical value and drives it to zero at V = -2t.
 
+4. The Heisenberg point itself (V = -2t), as T -> 0. The model is then exactly
+   an SU(2) ferromagnet on any connected lattice; its ground multiplet has total
+   spin M/2 and one state in every N-sector. At the particle-hole symmetric mu
+   those M + 1 states are degenerate, so the grand ensemble is uniform on
+   N = 0..M and, for even M,
+
+       sigma_N / <N> = sqrt((M + 2) / (3M))  ->  1/sqrt(3)    (M -> inf),
+
+   size-independent like the phase-separated case, but at a smaller value.
+
 Conventions: k_B = 1, energies in units of t (theory/README.md). The Ising
 results are thermodynamic-limit statements for the square lattice; the 2x2
 torus (a 4-site ring) and the 3x3 torus are not square-lattice-like enough for
@@ -84,6 +94,12 @@ def ising_number_fluctuation(V: float, T: np.ndarray | float) -> np.ndarray:
         inv4 = np.sinh(2.0 * J / T) ** -4.0
         m = np.where(T < ising_critical_temperature(V), (1.0 - inv4) ** 0.125, 0.0)
     return np.nan_to_num(m, nan=0.0)
+
+
+def heisenberg_number_fluctuation(M: int | np.ndarray) -> np.ndarray:
+    """T -> 0 limit of sigma_N/<N> at V = -2t and half filling (even M)."""
+    M = np.asarray(M, dtype=float)
+    return np.sqrt((M + 2.0) / (3.0 * M))
 
 
 def phase_separates(V: float, t: float = 1.0) -> bool:
