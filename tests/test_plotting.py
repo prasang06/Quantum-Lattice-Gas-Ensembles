@@ -61,3 +61,15 @@ def test_interaction_sweep_builds():
     fig = P.fig_interaction_sweep(L=3, beta=1.0, V_array=np.array([-2.0, 0.0, 2.0]))
     assert _is_fig(fig)
     plt.close("all")
+
+
+def test_temperature_figures_build(spectra_by_L):
+    import numpy as np
+
+    from qlge.scaling import temperature_sweep
+
+    T = np.geomspace(0.3, 5.0, 6)
+    sweeps = {V: temperature_sweep(spectra_by_L, 1.0 / T) for V in (0.0, -2.0)}
+    assert _is_fig(P.fig_temperature_exponents(sweeps))
+    assert _is_fig(P.fig_number_channel_temperature(sweeps, M_largest=9))
+    plt.close("all")

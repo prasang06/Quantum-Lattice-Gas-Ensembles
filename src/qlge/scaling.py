@@ -97,6 +97,44 @@ def fit_power_law(M: np.ndarray, y: np.ndarray) -> PowerLawFit:
     return PowerLawFit(exponent=float(slope), amplitude=float(np.exp(intercept)), r_squared=r2)
 
 
+SCALING_METRICS = (
+    "rel_energy_fluctuation",
+    "rel_number_fluctuation",
+    "energy_discrepancy_per_site",
+)
+
+
+def temperature_sweep(
+    spectra: dict[int, Spectrum],
+    betas: np.ndarray,
+    filling: float = 0.5,
+) -> dict[str, np.ndarray]:
+    """Finite-size exponents of each equivalence metric across a beta grid.
+
+    Repeats :func:`scaling_sweep` and :func:`fit_power_law` at every beta, so the
+    single-temperature scaling study becomes a function of T. Returns a dict
+    with ``"beta"`` and, for each name in ``SCALING_METRICS``, the fitted
+    exponent (key = name) and the metric on the largest lattice (key =
+    ``name + "_largest"``). Exponents are NaN where a fit is impossible.
+    """
+    betas = np.asarray(betas, dtype=float)
+    out = {"beta": betas}
+    for attr in SCALING_METRICS:
+        out[attr] = np.full(betas.shape, np.nan)
+        out[attr + "_largest"] = np.full(betas.shape, np.nan)
+    for k, beta in enumerate(betas):
+        pts = scaling_sweep(spectra, beta=float(beta), filling=filling)
+        M = np.array([p.M for p in pts], dtype=float)
+        for attr in SCALING_METRICS:
+            y = np.array([getattr(p, attr) for p in pts], dtype=float)
+            out[attr + "_largest"][k] = y[-1]
+            try:
+                out[attr][k] = fit_power_law(M, y).exponent
+            except ValueError:
+                pass
+    return out
+
+
 def load_spectra_by_L(
     V: float, bc: str = "periodic", data_dir: str = "data"
 ) -> dict[int, Spectrum]:

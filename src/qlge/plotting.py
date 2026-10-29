@@ -367,3 +367,96 @@ def fig_interaction_sweep(L=3, beta=1.0, filling=0.5, V_array=None, bc="open"):
     ax.legend()
     fig.tight_layout()
     return fig
+
+
+# ---------------------------------------------------------------------------
+# Figure 13 -- finite-size exponents as a function of temperature
+# ---------------------------------------------------------------------------
+def fig_temperature_exponents(sweeps: dict[float, dict[str, np.ndarray]], filling=0.5):
+    """Fitted exponent p (metric ~ M^p) of each equivalence metric versus T.
+
+    ``sweeps`` maps V -> :func:`qlge.scaling.temperature_sweep` output. Dotted
+    verticals mark the classical (t = 0) Onsager T_c for attractive couplings.
+    """
+    from qlge.benchmarks import ising_critical_temperature
+
+    metrics = [
+        ("rel_number_fluctuation", r"$p(\sigma_N/\langle N\rangle)$"),
+        ("energy_discrepancy_per_site", r"$p(|\Delta\langle E\rangle|/M)$"),
+        ("rel_energy_fluctuation", r"$p(\sigma_E/|\langle E\rangle|)$"),
+    ]
+    Vs = sorted(sweeps)
+    fig, axes = plt.subplots(1, 3, figsize=(14, 4.3), sharex=True)
+    for ax, (attr, label) in zip(axes, metrics):
+        for V in Vs:
+            sw = sweeps[V]
+            ax.semilogx(1.0 / sw["beta"], sw[attr], "-", color=_vcolor(V, Vs), label=f"$V/t={V:+g}$")
+            if V < 0 and attr == "rel_number_fluctuation":
+                ax.axvline(ising_critical_temperature(V), color=_vcolor(V, Vs), ls=":", lw=1)
+        ax.axhline(-0.5, color="gray", lw=0.8, ls="--")
+        ax.axhline(0.0, color="black", lw=0.6)
+        ax.set_xlabel("temperature $T/t$")
+        ax.set_ylabel(label)
+        ax.set_title(label)
+    axes[0].legend(fontsize=7)
+    fig.suptitle(
+        rf"Finite-size exponents vs temperature ($M=4,9,16$, filling $={filling:g}$; "
+        r"dashed: $M^{-1/2}$, dotted: classical Onsager $T_c$)",
+        y=1.03,
+    )
+    fig.tight_layout()
+    return fig
+
+
+# ---------------------------------------------------------------------------
+# Figure 14 -- number channel vs T against analytical baselines, and (V, T) map
+# ---------------------------------------------------------------------------
+def fig_number_channel_temperature(sweeps: dict[float, dict[str, np.ndarray]], M_largest: int,
+                                   filling=0.5):
+    """Left: sigma_N/<N> on the largest lattice vs T, with the beta -> 0 binomial
+    limit and the classical (t = 0) Ising prediction for V < 0. Right: the
+    number-channel exponent over the (V, T) plane; its zero contour separates
+    convergence from the phase-separation anomaly.
+    """
+    from qlge.benchmarks import (
+        infinite_temperature_number_fluctuation,
+        ising_critical_temperature,
+        ising_number_fluctuation,
+    )
+
+    Vs = sorted(sweeps)
+    T = 1.0 / sweeps[Vs[0]]["beta"]
+    fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(13, 4.6))
+
+    Tfine = np.geomspace(T.min(), T.max(), 400)
+    for V in Vs:
+        color = _vcolor(V, Vs)
+        ax0.semilogx(T, sweeps[V]["rel_number_fluctuation_largest"], "-", color=color,
+                     label=f"$V/t={V:+g}$")
+        if V < 0:
+            ax0.semilogx(Tfine, ising_number_fluctuation(V, Tfine), "--", color=color, lw=1)
+    N = max(1, min(M_largest - 1, round(filling * M_largest)))
+    ax0.axhline(float(infinite_temperature_number_fluctuation(M_largest, N)), color="gray",
+                lw=0.8, ls=":", label=r"$\beta\to0$ binomial")
+    ax0.set_xlabel("temperature $T/t$")
+    ax0.set_ylabel(rf"$\sigma_N/\langle N\rangle$ at $M={M_largest}$")
+    ax0.set_title("Number fluctuation (dashed: classical Ising, $M\\to\\infty$)")
+    ax0.legend(fontsize=7)
+
+    P = np.array([sweeps[V]["rel_number_fluctuation"] for V in Vs])  # (V, T)
+    vmax = np.nanmax(np.abs(P))
+    mesh = ax1.pcolormesh(np.array(Vs), T, P.T, shading="nearest", cmap="RdBu_r",
+                          vmin=-vmax, vmax=vmax)
+    ax1.contour(np.array(Vs), T, P.T, levels=[0.0], colors="black", linewidths=1.5)
+    Vneg = np.linspace(min(Vs), 0, 50)
+    ax1.plot(Vneg, [ising_critical_temperature(v) for v in Vneg], "k--", lw=1,
+             label=r"classical $T_c=0.567|V|$")
+    ax1.axvline(-2.0, color="black", ls=":", lw=1, label=r"Heisenberg point $V=-2t$")
+    ax1.set_yscale("log")
+    ax1.set_xlabel("interaction $V/t$")
+    ax1.set_ylabel("temperature $T/t$")
+    ax1.set_title(r"Exponent $p(\sigma_N/\langle N\rangle)$ (solid: $p=0$)")
+    ax1.legend(fontsize=7, loc="upper right")
+    fig.colorbar(mesh, ax=ax1, label="$p$")
+    fig.tight_layout()
+    return fig

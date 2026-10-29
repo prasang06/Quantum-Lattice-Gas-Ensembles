@@ -8,8 +8,10 @@ from __future__ import annotations
 import argparse
 import os
 
+import numpy as np
+
 from qlge import plotting as P
-from qlge.scaling import load_spectra_by_L
+from qlge.scaling import load_spectra_by_L, temperature_sweep
 
 
 def main() -> None:
@@ -20,6 +22,9 @@ def main() -> None:
     p.add_argument("--filling", type=float, default=0.5)
     p.add_argument("--data-dir", default="data")
     p.add_argument("--out", default="figures")
+    p.add_argument("--T-min", type=float, default=0.2)
+    p.add_argument("--T-max", type=float, default=10.0)
+    p.add_argument("--T-num", type=int, default=40)
     args = p.parse_args()
     os.makedirs(args.out, exist_ok=True)
 
@@ -75,6 +80,17 @@ def main() -> None:
     # 12. dense interaction sweep at fixed L (diagonalized on the fly; L=3 fast)
     out.append(P.save(P.fig_interaction_sweep(L=3, beta=args.beta, filling=args.filling),
                       f"{args.out}/fig12_interaction_sweep.png"))
+
+    # 13-14. temperature axis: exponents vs T and the number channel vs baselines
+    multi = {V: d for V, d in by_V_L.items() if len(d) >= 2}
+    if multi:
+        T = np.geomspace(args.T_min, args.T_max, args.T_num)
+        sweeps = {V: temperature_sweep(d, 1.0 / T, args.filling) for V, d in multi.items()}
+        out.append(P.save(P.fig_temperature_exponents(sweeps, args.filling),
+                          f"{args.out}/fig13_temperature_exponents.png"))
+        M_largest = min(max(d) for d in multi.values()) ** 2
+        out.append(P.save(P.fig_number_channel_temperature(sweeps, M_largest, args.filling),
+                          f"{args.out}/fig14_number_channel_temperature.png"))
 
     for pth in out:
         print("wrote", pth)

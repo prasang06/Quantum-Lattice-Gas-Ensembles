@@ -13,6 +13,7 @@ from qlge.scaling import (
     fit_power_law,
     filling_to_N,
     scaling_sweep,
+    temperature_sweep,
 )
 
 
@@ -59,3 +60,26 @@ def test_power_law_fit_negative_exponent(spectra):
 def test_power_law_fit_needs_two_points():
     with pytest.raises(ValueError):
         fit_power_law(np.array([4.0]), np.array([1.0]))
+
+
+def test_temperature_sweep_matches_single_beta(spectra):
+    betas = np.array([0.5, 1.0, 2.0])
+    sw = temperature_sweep(spectra, betas)
+    pts = scaling_sweep(spectra, beta=1.0)
+    M = np.array([p.M for p in pts])
+    y = np.array([p.rel_number_fluctuation for p in pts])
+    assert sw["rel_number_fluctuation"][1] == pytest.approx(fit_power_law(M, y).exponent)
+    assert sw["rel_number_fluctuation_largest"][1] == pytest.approx(y[-1])
+    assert sw["beta"].shape == sw["energy_discrepancy_per_site"].shape == (3,)
+
+
+def test_temperature_sweep_high_T_is_binomial(spectra):
+    # beta -> 0: sigma_N/<N> is binomial, so the fitted exponent equals the one
+    # the binomial baseline gives on the same (M, N). It is not -1/2: M=9 sits
+    # at N=4, off half filling, which alone tilts a two-point fit to ~ -0.36.
+    from qlge.benchmarks import infinite_temperature_number_fluctuation
+
+    sw = temperature_sweep(spectra, np.array([1e-4]))
+    M = np.array([4.0, 9.0])
+    y = np.array([infinite_temperature_number_fluctuation(m, filling_to_N(int(m), 0.5)) for m in M])
+    assert sw["rel_number_fluctuation"][0] == pytest.approx(fit_power_law(M, y).exponent, abs=1e-3)

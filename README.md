@@ -38,9 +38,10 @@ results are in [`paper/paper.pdf`](paper/paper.pdf).
 
 ```
 src/qlge/      the package: lattice, basis, hamiltonian, diagonalize,
-               ensembles, observables, matching, scaling, realspace,
-               plotting, animate, app
-scripts/       run_spectra, run_scaling, make_figures, make_animations, run_app
+               ensembles, observables, matching, scaling, benchmarks,
+               realspace, plotting, animate, app
+scripts/       run_spectra, run_scaling, run_temperature_sweep,
+               make_figures, make_animations
 tests/         the validation + verification suite
 theory/        physics derivations (start at theory/README.md)
 paper/         the write-up (paper.tex, paper.pdf)
@@ -57,9 +58,10 @@ uv pip install -e ".[dev]"            # add ,app for the dashboard, ,anim for Ma
 
 .venv/bin/python -m pytest -q         # validation + verification suite
 
-.venv/bin/python scripts/run_spectra.py     # build and cache the spectra first
+.venv/bin/python scripts/run_spectra.py --L 2 3 4 --V -3 -2 -1 0 1 2 3   # build and cache the spectra first
 .venv/bin/python scripts/run_scaling.py      # finite-size discrepancy metrics
-.venv/bin/python scripts/make_figures.py     # regenerate figures/
+.venv/bin/python scripts/run_temperature_sweep.py  # the same, across temperature
+.venv/bin/python scripts/make_figures.py --V -3 -2 -1 0 1 2 3  # regenerate figures/
 .venv/bin/python scripts/make_animations.py  # regenerate animations/
 .venv/bin/streamlit run src/qlge/app.py       # interactive dashboard (needs .[app])
 ```
