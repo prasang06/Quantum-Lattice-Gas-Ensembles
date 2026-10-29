@@ -1,6 +1,8 @@
 """Regenerate all static figures from cached spectra (PLAN.md Phase 6).
 
 Build spectra first with scripts/run_spectra.py. Figures land in figures/.
+``--family tilted`` instead draws the scaling figures (6, 13, 14) on the
+bipartite tilted clusters, as fig6b/fig13b/fig14b.
 """
 
 from __future__ import annotations
@@ -11,7 +13,29 @@ import os
 import numpy as np
 
 from qlge import plotting as P
-from qlge.scaling import load_spectra_by_L, temperature_sweep
+from qlge.scaling import load_cluster_spectra, load_spectra_by_L, temperature_sweep
+
+
+def tilted_figures(args) -> None:
+    """Scaling figures on the bipartite tilted clusters (M = 8, 10, 16, 18, 20)."""
+    by_V_M = {V: load_cluster_spectra(V, data_dir=args.data_dir) for V in args.V}
+    by_V_M = {V: d for V, d in by_V_M.items() if len(d) >= 2}
+    if not by_V_M:
+        raise SystemExit("no cached cluster spectra; run scripts/run_spectra.py --clusters ...")
+    label = " (tilted bipartite clusters)"
+    T = np.geomspace(args.T_min, args.T_max, args.T_num)
+    sweeps = {V: temperature_sweep(d, 1.0 / T, args.filling) for V, d in by_V_M.items()}
+    M_largest = min(max(d) for d in by_V_M.values())
+    out = [
+        P.save(P.fig_scaling(by_V_M, args.beta, args.filling, family=label),
+               f"{args.out}/fig6b_scaling_tilted.png"),
+        P.save(P.fig_temperature_exponents(sweeps, args.filling, family=label),
+               f"{args.out}/fig13b_temperature_exponents_tilted.png"),
+        P.save(P.fig_number_channel_temperature(sweeps, M_largest, args.filling),
+               f"{args.out}/fig14b_number_channel_temperature_tilted.png"),
+    ]
+    for pth in out:
+        print("wrote", pth)
 
 
 def main() -> None:
@@ -25,8 +49,12 @@ def main() -> None:
     p.add_argument("--T-min", type=float, default=0.2)
     p.add_argument("--T-max", type=float, default=10.0)
     p.add_argument("--T-num", type=int, default=40)
+    p.add_argument("--family", choices=["square", "tilted"], default="square")
     args = p.parse_args()
     os.makedirs(args.out, exist_ok=True)
+
+    if args.family == "tilted":
+        return tilted_figures(args)
 
     # spectra_by_V_L[V][L] = Spectrum
     by_V_L = {V: load_spectra_by_L(V, args.bc, args.data_dir) for V in args.V}

@@ -29,8 +29,12 @@ class RunConfig:
     V: float = 0.0
     bc: BoundaryCondition = "periodic"
 
-    # Which particle-number sectors to build (None -> all N = 0..L*L).
+    # Which particle-number sectors to build (None -> all N = 0..n_sites).
     n_sectors: tuple[int, ...] | None = None
+
+    # Tilted periodic cluster wrap vectors (a1x, a1y, a2x, a2y); see cluster.py.
+    # When set, it replaces the L x L torus and L is ignored.
+    cluster: tuple[int, int, int, int] | None = None
 
     # Microcanonical modeling choices
     dE: float = 0.5  # energy-window width for Omega(E, N; dE)
@@ -50,6 +54,8 @@ class RunConfig:
     def __post_init__(self) -> None:
         if self.L < 1:
             raise ValueError(f"L must be >= 1, got {self.L}")
+        if self.cluster is not None and self.bc != "periodic":
+            raise ValueError("tilted clusters are periodic by construction")
         if self.bc not in ("open", "periodic"):
             raise ValueError(f"bc must be 'open' or 'periodic', got {self.bc!r}")
         if self.dE <= 0:
@@ -63,8 +69,20 @@ class RunConfig:
 
     @property
     def n_sites(self) -> int:
-        """Number of lattice sites M = L^2."""
+        """Number of lattice sites: L^2, or |det[a1 a2]| for a tilted cluster."""
+        if self.cluster is not None:
+            a1x, a1y, a2x, a2y = self.cluster
+            return abs(a1x * a2y - a1y * a2x)
         return self.L * self.L
+
+    def cluster_geometry(self):
+        """The :class:`qlge.cluster.Cluster` for a tilted-cluster config."""
+        from qlge.cluster import Cluster
+
+        if self.cluster is None:
+            raise ValueError("config describes an L x L torus, not a tilted cluster")
+        a1x, a1y, a2x, a2y = self.cluster
+        return Cluster((a1x, a1y), (a2x, a2y))
 
     def sectors(self) -> tuple[int, ...]:
         """Resolved list of N-sectors to build."""
@@ -83,7 +101,7 @@ class RunConfig:
     @classmethod
     def from_dict(cls, d: dict) -> RunConfig:
         d = dict(d)
-        for key in ("n_sectors",):
+        for key in ("n_sectors", "cluster"):
             if d.get(key) is not None:
                 d[key] = tuple(d[key])
         return cls(**d)
@@ -95,4 +113,6 @@ class RunConfig:
 
     def tag(self) -> str:
         """Short filesystem-safe identifier for cache files."""
+        if self.cluster is not None:
+            return f"C{self.n_sites}_t{self.t:g}_V{self.V:g}_{self.bc}"
         return f"L{self.L}_t{self.t:g}_V{self.V:g}_{self.bc}"

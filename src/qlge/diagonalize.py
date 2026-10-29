@@ -95,8 +95,16 @@ def diagonalize_sector_vectors(config: RunConfig, N: int):
     return sector, evals, evecs
 
 
-def diagonalize(config: RunConfig) -> Spectrum:
-    """Diagonalize every requested N-sector and return a :class:`Spectrum`."""
+def diagonalize(config: RunConfig, progress=None) -> Spectrum:
+    """Diagonalize every requested N-sector and return a :class:`Spectrum`.
+
+    Tilted clusters go through the symmetry-reduced path (symmetry.py); L x L
+    lattices are diagonalized sector by sector, densely.
+    """
+    if config.cluster is not None:
+        from qlge.symmetry import diagonalize_cluster
+
+        return Spectrum(config=config, eigenvalues=diagonalize_cluster(config, progress))
     eigenvalues = {N: diagonalize_sector(config, N) for N in config.sectors()}
     return Spectrum(config=config, eigenvalues=eigenvalues)
 

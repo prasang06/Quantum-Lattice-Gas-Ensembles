@@ -177,7 +177,8 @@ def fig_energy_ensembles(spectrum: Spectrum, N: int, T=None):
 # ---------------------------------------------------------------------------
 # Figure 6 -- finite-size scaling of equivalence metrics (the headline)
 # ---------------------------------------------------------------------------
-def fig_scaling(spectra_by_V_L: dict[float, dict[int, Spectrum]], beta: float, filling=0.5):
+def fig_scaling(spectra_by_V_L: dict[float, dict[int, Spectrum]], beta: float, filling=0.5,
+                family: str = ""):
     metrics = [
         ("rel_energy_fluctuation", r"$\sigma_E/|\langle E\rangle|$"),
         ("rel_number_fluctuation", r"$\sigma_N/\langle N\rangle$"),
@@ -201,12 +202,12 @@ def fig_scaling(spectra_by_V_L: dict[float, dict[int, Spectrum]], beta: float, f
             except ValueError:
                 lab = f"$V/t={V:+g}$"
             ax.loglog(M, y, "o", color=color, label=lab)
-        ax.set_xlabel("system size $M=L^2$")
+        ax.set_xlabel("system size $M$ (sites)")
         ax.set_ylabel(label)
         ax.set_title(label)
         ax.legend(fontsize=7, ncol=1)
     fig.suptitle(
-        rf"Emergence of ensemble equivalence with size, $\beta t={beta:g}$, filling $={filling:g}$",
+        rf"Emergence of ensemble equivalence with size{family}, $\beta t={beta:g}$, filling $={filling:g}$",
         y=1.03,
     )
     fig.tight_layout()
@@ -372,7 +373,8 @@ def fig_interaction_sweep(L=3, beta=1.0, filling=0.5, V_array=None, bc="open"):
 # ---------------------------------------------------------------------------
 # Figure 13 -- finite-size exponents as a function of temperature
 # ---------------------------------------------------------------------------
-def fig_temperature_exponents(sweeps: dict[float, dict[str, np.ndarray]], filling=0.5):
+def fig_temperature_exponents(sweeps: dict[float, dict[str, np.ndarray]], filling=0.5,
+                              family: str = ""):
     """Fitted exponent p (metric ~ M^p) of each equivalence metric versus T.
 
     ``sweeps`` maps V -> :func:`qlge.scaling.temperature_sweep` output. Dotted
@@ -400,7 +402,8 @@ def fig_temperature_exponents(sweeps: dict[float, dict[str, np.ndarray]], fillin
         ax.set_title(label)
     axes[0].legend(fontsize=7)
     fig.suptitle(
-        rf"Finite-size exponents vs temperature ($M=4,9,16$, filling $={filling:g}$; "
+        rf"Finite-size exponents vs temperature{family} "
+        rf"($M={','.join(str(m) for m in next(iter(sweeps.values()))['M'])}$, filling $={filling:g}$; "
         r"dashed: $M^{-1/2}$, dotted: classical Onsager $T_c$)" "\n"
         r"spikes in the middle and right panels are where the metric crosses zero "
         r"($\langle E\rangle$ or $\Delta\langle E\rangle$ changes sign), not physics",

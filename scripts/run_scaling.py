@@ -2,7 +2,8 @@
 
 Reads cached spectra from ``data/`` (build them first with run_spectra.py),
 sweeps L at matched filling and beta for each V, and prints the ensemble
-discrepancy metrics plus their power-law fits in M = L^2.
+discrepancy metrics plus their power-law fits in the number of sites M.
+``--family tilted`` uses the bipartite tilted clusters (M = 8..20) instead.
 
 Usage:
     python scripts/run_scaling.py
@@ -15,7 +16,13 @@ import argparse
 
 import numpy as np
 
-from qlge.scaling import fit_power_law, load_spectra_by_L, scaling_sweep
+from qlge.scaling import fit_power_law, load_cluster_spectra, load_spectra_by_L, scaling_sweep
+
+
+def load_family(args, V: float):
+    if args.family == "tilted":
+        return load_cluster_spectra(V, tuple(args.sizes) if args.sizes else None, args.data_dir)
+    return load_spectra_by_L(V, args.bc, args.data_dir)
 
 
 def main() -> None:
@@ -25,16 +32,20 @@ def main() -> None:
     p.add_argument("--filling", type=float, default=0.5)
     p.add_argument("--bc", choices=["open", "periodic"], default="periodic")
     p.add_argument("--data-dir", default="data")
+    p.add_argument("--family", choices=["square", "tilted"], default="square",
+                   help="L x L tori (L=2,3,4) or the bipartite tilted clusters (M=8..20)")
+    p.add_argument("--sizes", type=int, nargs="+", default=None,
+                   help="tilted family only: restrict to these cluster sizes M")
     args = p.parse_args()
 
     for V in args.V:
-        spectra = load_spectra_by_L(V, args.bc, args.data_dir)
+        spectra = load_family(args, V)
         if len(spectra) < 2:
             print(f"V={V:+g}: need >= 2 lattice sizes cached, found {sorted(spectra)}")
             continue
         pts = scaling_sweep(spectra, beta=args.beta, filling=args.filling)
 
-        print(f"\nV={V:+g}  beta={args.beta}  filling={args.filling}  bc={args.bc}")
+        print(f"\nV={V:+g}  beta={args.beta}  filling={args.filling}  family={args.family}")
         print(f"  {'L':>2} {'M':>3} {'N':>2} {'relE':>8} {'relN':>8} {'dEgap/site':>11}")
         for pt in pts:
             print(

@@ -64,9 +64,16 @@ def build_sector(
     return H.tocsr()
 
 
+def config_bonds(config: RunConfig) -> list[tuple[int, int]]:
+    """Bond list of the config's lattice: L x L torus/open grid, or tilted cluster."""
+    if config.cluster is not None:
+        return config.cluster_geometry().bonds
+    return bonds(config.L, config.bc)
+
+
 def build_from_config(config: RunConfig, N: int) -> tuple[Sector, sp.csr_matrix]:
     """Convenience: build the sector basis and Hamiltonian for config at fixed N."""
     sector = Sector(config.n_sites, N)
-    bond_list = bonds(config.L, config.bc)
+    bond_list = config_bonds(config)
     H = build_sector(sector, bond_list, config.t, config.V)
     return sector, H

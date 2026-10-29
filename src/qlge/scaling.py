@@ -21,7 +21,7 @@ from qlge.matching import MatchResult, match_ensembles
 
 @dataclass
 class ScalingPoint:
-    L: int
+    L: int  # size label: L for L x L tori, M for tilted clusters
     M: int
     V: float
     N: int
@@ -55,9 +55,11 @@ def scaling_sweep(
     beta: float,
     filling: float = 0.5,
 ) -> list[ScalingPoint]:
-    """Collect scaling points across the provided spectra (keyed by L).
+    """Collect scaling points across the provided spectra (keyed by size label).
 
-    All spectra should share the same V and boundary condition; only L varies.
+    All spectra should share the same V and boundary condition; only the size
+    varies. Keys are L for L x L tori (load_spectra_by_L) or M for tilted
+    clusters (load_cluster_spectra); points come back in key order.
     """
     points: list[ScalingPoint] = []
     for L in sorted(spectra):
@@ -115,10 +117,12 @@ def temperature_sweep(
     single-temperature scaling study becomes a function of T. Returns a dict
     with ``"beta"`` and, for each name in ``SCALING_METRICS``, the fitted
     exponent (key = name) and the metric on the largest lattice (key =
-    ``name + "_largest"``). Exponents are NaN where a fit is impossible.
+    ``name + "_largest"``), plus ``"M"``, the sizes fitted. Exponents are NaN
+    where a fit is impossible.
     """
     betas = np.asarray(betas, dtype=float)
-    out = {"beta": betas}
+    out = {"beta": betas,
+           "M": np.array([spectra[key].config.n_sites for key in sorted(spectra)])}
     for attr in SCALING_METRICS:
         out[attr] = np.full(betas.shape, np.nan)
         out[attr + "_largest"] = np.full(betas.shape, np.nan)
@@ -142,6 +146,19 @@ def load_spectra_by_L(
     out: dict[int, Spectrum] = {}
     for path in sorted(glob.glob(os.path.join(data_dir, "spectrum_*.npz"))):
         spec = Spectrum.load(path)
-        if spec.config.V == V and spec.config.bc == bc:
+        if spec.config.V == V and spec.config.bc == bc and spec.config.cluster is None:
             out[spec.config.L] = spec
+    return out
+
+
+def load_cluster_spectra(
+    V: float, sizes: tuple[int, ...] | None = None, data_dir: str = "data"
+) -> dict[int, Spectrum]:
+    """Load every cached tilted-cluster spectrum at coupling V, keyed by M."""
+    out: dict[int, Spectrum] = {}
+    for path in sorted(glob.glob(os.path.join(data_dir, "spectrum_C*.npz"))):
+        spec = Spectrum.load(path)
+        M = spec.config.n_sites
+        if spec.config.V == V and spec.config.cluster is not None and (sizes is None or M in sizes):
+            out[M] = spec
     return out
